@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Threading;
 
 public class Chunk {
 
@@ -17,6 +18,8 @@ public class Chunk {
     Material[] materials = new Material[2];
     List<Vector2> uvs = new List<Vector2>();
 
+    public Vector3 position;
+
     public byte[,,] voxelMap = new byte[VoxelData.ChunkWidth, VoxelData.ChunkHeight, VoxelData.ChunkWidth];
 
     public Queue<VoxelMod> modifications = new Queue<VoxelMod>();
@@ -24,7 +27,8 @@ public class Chunk {
     World world;
 
     private bool _isActive;
-    public bool isVoxelMapPopulated = false;
+    private bool isVoxelMapPopulated = false;
+    private bool threadLocked = false;
 
     public Chunk(ChunkCoord _coord, World _world, bool generateOnLoad) {
         coord = _coord;
@@ -48,8 +52,10 @@ public class Chunk {
         chunkObject.transform.position = new Vector3(coord.x * VoxelData.ChunkWidth, 0f, coord.z * VoxelData.ChunkWidth);
         chunkObject.name = "Chunk " + coord.x + ", " + coord.z;
 
-        PopulateVoxelMap();
-        UpdateChunk();
+        position = chunkObject.transform.position;
+
+        Thread myThread = new Thread(new ThreadStart(PopulateVoxelMap));
+        myThread.Start();
     }
 
     void PopulateVoxelMap() {
@@ -61,10 +67,18 @@ public class Chunk {
             }
         }
 
+        _UpdateChunk();
         isVoxelMapPopulated = true;
     }
 
     public void UpdateChunk() {
+        Thread myThread = new Thread(new ThreadStart(_UpdateChunk));
+        myThread.Start();
+    }
+
+    private void _UpdateChunk() {
+        threadLocked = true;
+
         while(modifications.Count > 0) {
             VoxelMod v = modifications.Dequeue();
             Vector3 pos = v.position -= position;
@@ -82,7 +96,11 @@ public class Chunk {
             }
         }
 
-        CreateMesh();
+        lock(world.chunksToDraw) {
+            world.chunksToDraw.Enqueue(this);
+        }
+
+        threadLocked = false;
     }
 
     void ClearMeshData() {
@@ -102,9 +120,13 @@ public class Chunk {
         }
     }
 
-    public Vector3 position {
+    public bool isEditable {
         get {
-            return chunkObject.transform.position;
+            if(!isVoxelMapPopulated || threadLocked)
+                return false;
+            else
+                return true;
+
         }
     }
 
@@ -196,7 +218,7 @@ public class Chunk {
         }
     }
 
-    void CreateMesh() {
+    public void CreateMesh() {
         Mesh mesh = new Mesh();
         mesh.vertices = vertices.ToArray();
         mesh.subMeshCount = 2;
