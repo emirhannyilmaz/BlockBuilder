@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Threading;
 
 public class Chunk {
 
@@ -28,15 +27,10 @@ public class Chunk {
 
     private bool _isActive;
     private bool isVoxelMapPopulated = false;
-    private bool threadLocked = false;
 
-    public Chunk(ChunkCoord _coord, World _world, bool generateOnLoad) {
+    public Chunk(ChunkCoord _coord, World _world) {
         coord = _coord;
         world = _world;
-        _isActive = true;
-
-        if(generateOnLoad)
-            Init();
     }
 
     public void Init() {
@@ -54,8 +48,7 @@ public class Chunk {
 
         position = chunkObject.transform.position;
 
-        Thread myThread = new Thread(new ThreadStart(PopulateVoxelMap));
-        myThread.Start();
+        PopulateVoxelMap();
     }
 
     void PopulateVoxelMap() {
@@ -67,18 +60,13 @@ public class Chunk {
             }
         }
 
-        _UpdateChunk();
         isVoxelMapPopulated = true;
+        lock(world.ChunkUpdateThreadLock) {
+            world.chunksToUpdate.Add(this);
+        }
     }
 
     public void UpdateChunk() {
-        Thread myThread = new Thread(new ThreadStart(_UpdateChunk));
-        myThread.Start();
-    }
-
-    private void _UpdateChunk() {
-        threadLocked = true;
-
         while(modifications.Count > 0) {
             VoxelMod v = modifications.Dequeue();
             Vector3 pos = v.position -= position;
@@ -96,11 +84,7 @@ public class Chunk {
             }
         }
 
-        lock(world.chunksToDraw) {
-            world.chunksToDraw.Enqueue(this);
-        }
-
-        threadLocked = false;
+        world.chunksToDraw.Enqueue(this);
     }
 
     void ClearMeshData() {
@@ -122,7 +106,7 @@ public class Chunk {
 
     public bool isEditable {
         get {
-            if(!isVoxelMapPopulated || threadLocked)
+            if(!isVoxelMapPopulated)
                 return false;
             else
                 return true;
@@ -147,9 +131,10 @@ public class Chunk {
 
         voxelMap[xCheck, yCheck, zCheck] = newID;
 
-        UpdateSurroundingVoxels(xCheck, yCheck, zCheck);
-
-        UpdateChunk();
+        lock(world.ChunkUpdateThreadLock) {
+            world.chunksToUpdate.Insert(0, this);
+            UpdateSurroundingVoxels(xCheck, yCheck, zCheck);
+        }
     }
 
     void UpdateSurroundingVoxels(int x, int y, int z) {
@@ -159,7 +144,7 @@ public class Chunk {
             Vector3 currentVoxel = thisVoxel + VoxelData.faceChecks[p];
 
             if(!IsVoxelInChunk((int) currentVoxel.x, (int) currentVoxel.y, (int) currentVoxel.z)) {
-                world.GetChunkFromVector3(currentVoxel + position).UpdateChunk();
+                world.chunksToUpdate.Insert(0, world.GetChunkFromVector3(currentVoxel + position));
             }
         }
     }
