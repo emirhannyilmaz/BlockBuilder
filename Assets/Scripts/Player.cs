@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class Player : MonoBehaviour {
     public float walkSpeed = 3f;
@@ -11,7 +10,6 @@ public class Player : MonoBehaviour {
     public float playerWidth = 0.15f;
     public bool isGrounded;
     public bool isSprinting;
-    public float mouseSensitivity = 5f;
 
     private Transform cam;
     private World world;
@@ -48,8 +46,8 @@ public class Player : MonoBehaviour {
         if(jumpRequest)
             Jump();
 
-        transform.Rotate(Vector3.up * mouseHorizontal);
-        cam.Rotate(Vector3.right * -mouseVertical);
+        transform.Rotate(Vector3.up * mouseHorizontal * world.settings.mouseSensitivity);
+        cam.Rotate(Vector3.right * -mouseVertical * world.settings.mouseSensitivity);
         transform.Translate(velocity, Space.World);
     }
 
@@ -84,8 +82,8 @@ public class Player : MonoBehaviour {
     private void GetPlayerInputs() {
         horizontal = Input.GetAxis("Horizontal");
         vertical = Input.GetAxis("Vertical");
-        mouseHorizontal = Input.GetAxis("Mouse X") * mouseSensitivity;
-        mouseVertical = Input.GetAxis("Mouse Y") * mouseSensitivity;
+        mouseHorizontal = Input.GetAxis("Mouse X");
+        mouseVertical = Input.GetAxis("Mouse Y");
 
         if(Input.GetButtonDown("Sprint"))
             isSprinting = true;
