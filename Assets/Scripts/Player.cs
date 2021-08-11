@@ -80,6 +80,9 @@ public class Player : MonoBehaviour {
     }
 
     private void GetPlayerInputs() {
+        if(Input.GetKeyDown(KeyCode.Escape))
+            Application.Quit();
+
         horizontal = Input.GetAxis("Horizontal");
         vertical = Input.GetAxis("Vertical");
         mouseHorizontal = Input.GetAxis("Mouse X");

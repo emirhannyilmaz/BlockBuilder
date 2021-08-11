@@ -48,16 +48,20 @@ public class World : MonoBehaviour {
         chunkUpdateThread = new Thread(new ThreadStart(ThreadedUpdate));
         chunkUpdateThread.Start();
 
+        SetGlobalLightValue();
+
         spawnPosition = new Vector3((VoxelData.WorldSizeInChunks * VoxelData.ChunkWidth) / 2f, VoxelData.ChunkHeight - 50f, (VoxelData.WorldSizeInChunks * VoxelData.ChunkWidth) / 2f);
         GenerateWorld();
         playerLastChunkCoord = GetChunkCoordFromVector3(player.position);
     }
 
-    private void Update() {
-        playerChunkCoord = GetChunkCoordFromVector3(player.position);
-
+    public void SetGlobalLightValue() {
         Shader.SetGlobalFloat("GlobalLightLevel", globalLightLevel);
         Camera.main.backgroundColor = Color.Lerp(night, day, globalLightLevel);
+    }
+
+    private void Update() {
+        playerChunkCoord = GetChunkCoordFromVector3(player.position);
 
         if(!playerChunkCoord.Equals(playerLastChunkCoord))
             CheckViewDistance();
@@ -101,7 +105,8 @@ public class World : MonoBehaviour {
             while(!updated && index < chunksToUpdate.Count - 1) {
                 if(chunksToUpdate[index].isEditable) {
                     chunksToUpdate[index].UpdateChunk();
-                    activeChunks.Add(chunksToUpdate[index].coord);
+                    if(!activeChunks.Contains(chunksToUpdate[index].coord))
+                        activeChunks.Add(chunksToUpdate[index].coord);
                     chunksToUpdate.RemoveAt(index);
                     updated = true;
                 } else
@@ -168,18 +173,20 @@ public class World : MonoBehaviour {
 
         for(int x = coord.x - settings.viewDistance; x < coord.x + settings.viewDistance; x++) {
             for(int z = coord.z - settings.viewDistance; z < coord.z + settings.viewDistance; z++) {
-                if(IsChunkInWorld(new ChunkCoord(x, z))) {
+                ChunkCoord thisChunkCoord = new ChunkCoord(x, z);
+
+                if(IsChunkInWorld(thisChunkCoord)) {
                     if(chunks[x, z] == null) {
-                        chunks[x, z] = new Chunk(new ChunkCoord(x, z), this);
-                        chunksToCreate.Add(new ChunkCoord(x, z));
+                        chunks[x, z] = new Chunk(thisChunkCoord, this);
+                        chunksToCreate.Add(thisChunkCoord);
                     } else if(!chunks[x, z].isActive) {
                         chunks[x, z].isActive = true;
                     }
-                    activeChunks.Add(new ChunkCoord(x, z));
+                    activeChunks.Add(thisChunkCoord);
                 }
 
                 for(int i = 0; i < previouslyActiveChunks.Count; i++) {
-                    if(previouslyActiveChunks[i].Equals(new ChunkCoord(x, z)))
+                    if(previouslyActiveChunks[i].Equals(thisChunkCoord))
                         previouslyActiveChunks.RemoveAt(i);
                 }
             }

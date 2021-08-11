@@ -16,6 +16,7 @@ public class Chunk {
     Material[] materials = new Material[2];
     List<Vector2> uvs = new List<Vector2>();
     List<Color> colors = new List<Color>();
+    List<Vector3> normals = new List<Vector3>();
 
     public Vector3 position;
 
@@ -38,9 +39,9 @@ public class Chunk {
         meshRenderer = chunkObject.AddComponent<MeshRenderer>();
         meshFilter = chunkObject.AddComponent<MeshFilter>();
 
-        //materials[0] = world.material;
-        //materials[1] = world.transparentMaterial;
-        meshRenderer.material = world.material;
+        materials[0] = world.material;
+        materials[1] = world.transparentMaterial;
+        meshRenderer.materials = materials;
 
         chunkObject.transform.SetParent(world.transform);
         chunkObject.transform.position = new Vector3(coord.x * VoxelData.ChunkWidth, 0f, coord.z * VoxelData.ChunkWidth);
@@ -138,6 +139,7 @@ public class Chunk {
         transparentTriangles.Clear();
         uvs.Clear();
         colors.Clear();
+        normals.Clear();
     }
 
     public bool isActive {
@@ -232,6 +234,10 @@ public class Chunk {
                 vertices.Add(pos + VoxelData.voxelVerts[VoxelData.voxelTris[p, 1]]);
                 vertices.Add(pos + VoxelData.voxelVerts[VoxelData.voxelTris[p, 2]]);
                 vertices.Add(pos + VoxelData.voxelVerts[VoxelData.voxelTris[p, 3]]);
+
+                for(int i = 0; i < 4; i++)
+                    normals.Add(VoxelData.faceChecks[p]);
+
                 AddTexture(world.blockTypes[blockID].GetTextureId(p));
 
                 float lightLevel = neighbor.globalLightPercent;
@@ -241,21 +247,21 @@ public class Chunk {
                 colors.Add(new Color(0, 0, 0, lightLevel));
                 colors.Add(new Color(0, 0, 0, lightLevel));
 
-                //if(!isTransparent) {
-                triangles.Add(vertexIndex);
-                triangles.Add(vertexIndex + 1);
-                triangles.Add(vertexIndex + 2);
-                triangles.Add(vertexIndex + 2);
-                triangles.Add(vertexIndex + 1);
-                triangles.Add(vertexIndex + 3);
-                /*} else {
+                if(!world.blockTypes[neighbor.id].renderNeighborFaces) {
+                    triangles.Add(vertexIndex);
+                    triangles.Add(vertexIndex + 1);
+                    triangles.Add(vertexIndex + 2);
+                    triangles.Add(vertexIndex + 2);
+                    triangles.Add(vertexIndex + 1);
+                    triangles.Add(vertexIndex + 3);
+                } else {
                     transparentTriangles.Add(vertexIndex);
                     transparentTriangles.Add(vertexIndex + 1);
                     transparentTriangles.Add(vertexIndex + 2);
                     transparentTriangles.Add(vertexIndex + 2);
                     transparentTriangles.Add(vertexIndex + 1);
                     transparentTriangles.Add(vertexIndex + 3);
-                }*/
+                }
 
                 vertexIndex += 4;
             }
@@ -265,14 +271,12 @@ public class Chunk {
     public void CreateMesh() {
         Mesh mesh = new Mesh();
         mesh.vertices = vertices.ToArray();
-        //mesh.subMeshCount = 2;
-        //mesh.SetTriangles(triangles.ToArray(), 0);
-        //mesh.SetTriangles(transparentTriangles.ToArray(), 1);
-        mesh.triangles = triangles.ToArray();
+        mesh.subMeshCount = 2;
+        mesh.SetTriangles(triangles.ToArray(), 0);
+        mesh.SetTriangles(transparentTriangles.ToArray(), 1);
         mesh.uv = uvs.ToArray();
         mesh.colors = colors.ToArray();
-
-        mesh.RecalculateNormals();
+        mesh.normals = normals.ToArray();
 
         meshFilter.mesh = mesh;
     }
