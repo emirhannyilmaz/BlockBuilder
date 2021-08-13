@@ -6,7 +6,7 @@ using System.IO;
 
 public class World : MonoBehaviour {
     public Settings settings;
-    public BiomeAttributes biome;
+    public BiomeAttributes[] biomes;
     [Range(0f, 1f)]
     public float globalLightLevel;
     public Color day;
@@ -229,15 +229,42 @@ public class World : MonoBehaviour {
         if(yPos == 0)
             return 1;
 
-        int terrainHeight = Mathf.FloorToInt(biome.terrainHeight * Noise.Get2DPerlin(new Vector2(pos.x, pos.z), 0f, biome.terrainScale) + biome.solidGroundHeight);
-        byte voxelValue = 0;
+        //Biome selection pass
+
+        int solidGroundHeight = 42;
+        float sumOfHeights = 0f;
+        int count = 0;
+        float strongestWeight = 0f;
+        int strongestBiomeIndex = 0;
+
+        for(int i = 0; i < biomes.Length; i++) {
+            float weight = Noise.Get2DPerlin(new Vector2(pos.x, pos.z), biomes[i].offset, biomes[i].scale);
+            if(weight > strongestWeight) {
+                strongestWeight = weight;
+                strongestBiomeIndex = i;
+            }
+
+            float height = biomes[i].terrainHeight * Noise.Get2DPerlin(new Vector2(pos.x, pos.z), 0f, biomes[i].terrainScale) * weight;
+
+            if(height > 0) {
+                sumOfHeights += height;
+                count++;
+            }
+        }
+
+        BiomeAttributes biome = biomes[strongestBiomeIndex];
+
+        sumOfHeights /= count;
 
         //Basic terrain pass
+        
+        int terrainHeight = Mathf.FloorToInt(sumOfHeights + solidGroundHeight);
+        byte voxelValue = 0;
 
         if(yPos == terrainHeight)
-            voxelValue = 3;
+            voxelValue = biome.surfaceBlock;
         else if(yPos < terrainHeight && yPos > terrainHeight - 4)
-            voxelValue = 5;
+            voxelValue = biome.subSurfaceBlock;
         else if(yPos > terrainHeight)
             return 0;
         else
@@ -255,10 +282,10 @@ public class World : MonoBehaviour {
 
         //Tree pass
 
-        if(yPos == terrainHeight) {
-            if(Noise.Get2DPerlin(new Vector2(pos.x, pos.z), 0, biome.treeZoneScale) > biome.treeZoneThreshold) {
-                if(Noise.Get2DPerlin(new Vector2(pos.x, pos.z), 0, biome.treePlacementScale) > biome.treePlacementThreshold) {
-                    modifications.Enqueue(Structure.MakeTree(pos, biome.minTreeHeight, biome.maxTreeHeight));
+        if(yPos == terrainHeight && biome.placeMajorFlora) {
+            if(Noise.Get2DPerlin(new Vector2(pos.x, pos.z), 0, biome.majorFloraZoneScale) > biome.majorFloraZoneThreshold) {
+                if(Noise.Get2DPerlin(new Vector2(pos.x, pos.z), 0, biome.majorFloraPlacementScale) > biome.majorFloraPlacementThreshold) {
+                    modifications.Enqueue(Structure.GenerateMajorFlora(biome.majorFloraIndex, pos, biome.minHeight, biome.maxHeight));
                 }
             }
         }
@@ -343,4 +370,7 @@ public class Settings {
 
     [Header("World Generation")]
     public int seed;
+
+    [Header("Animation")]
+    public bool enableAnimatedChunks;
 }
