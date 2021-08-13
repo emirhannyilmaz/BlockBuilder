@@ -66,7 +66,7 @@ public class Chunk {
             world.chunksToUpdate.Add(this);
         }
 
-        if(world.settings.enableAnimatedChunks)
+        if(world.settings.animatedChunks)
             chunkObject.AddComponent<ChunkLoadAnimation>();
     }
 

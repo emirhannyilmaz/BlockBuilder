@@ -34,13 +34,10 @@ public class World : MonoBehaviour {
     public object ChunkUpdateThreadLock = new object();
 
     private void Start() {
-        //string jsonExport = JsonUtility.ToJson(settings);
-        //File.WriteAllText(Application.dataPath + "/settings.cfg", jsonExport);
-
         string jsonImport = File.ReadAllText(Application.dataPath + "/settings.cfg");
         settings = JsonUtility.FromJson<Settings>(jsonImport);
 
-        Random.InitState(settings.seed);
+        Random.InitState(VoxelData.seed);
 
         Shader.SetGlobalFloat("minGlobalLightLevel", VoxelData.minLightLevel);
         Shader.SetGlobalFloat("maxGlobalLightLevel", VoxelData.maxLightLevel);
@@ -362,15 +359,10 @@ public class VoxelMod {
 [System.Serializable]
 public class Settings {
     [Header("Performance")]
-    public int viewDistance;
+    public int viewDistance = 8;
+    public bool animatedChunks = true;
 
     [Header("Controls")]
-    [Range(0.1f, 10f)]
-    public float mouseSensitivity;
-
-    [Header("World Generation")]
-    public int seed;
-
-    [Header("Animation")]
-    public bool enableAnimatedChunks;
+    [Range(0.5f, 10f)]
+    public float sensitivity = 3f;
 }

@@ -46,8 +46,8 @@ public class Player : MonoBehaviour {
         if(jumpRequest)
             Jump();
 
-        transform.Rotate(Vector3.up * mouseHorizontal * world.settings.mouseSensitivity);
-        cam.Rotate(Vector3.right * -mouseVertical * world.settings.mouseSensitivity);
+        transform.Rotate(Vector3.up * mouseHorizontal * world.settings.sensitivity);
+        cam.Rotate(Vector3.right * -mouseVertical * world.settings.sensitivity);
         transform.Translate(velocity, Space.World);
     }
 

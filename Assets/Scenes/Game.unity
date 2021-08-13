@@ -153,10 +153,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   settings:
-    viewDistance: 4
-    mouseSensitivity: 5
-    seed: 2147483647
-    enableAnimatedChunks: 0
+    viewDistance: 8
+    animatedChunks: 1
+    sensitivity: 3
   biomes:
   - {fileID: 11400000, guid: dce744e9056560b4992075c71a7d1d35, type: 2}
   - {fileID: 11400000, guid: 44434779c14b1644d837458f5e2d044b, type: 2}
