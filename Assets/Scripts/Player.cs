@@ -4,12 +4,10 @@ using UnityEngine;
 
 public class Player : MonoBehaviour {
     public float walkSpeed = 3f;
-    public float sprintSpeed = 6f;
     public float jumpForce = 5f;
     public float gravity = -9.8f;
     public float playerWidth = 0.15f;
     public bool isGrounded;
-    public bool isSprinting;
 
     private Transform cam;
     private World world;
@@ -19,7 +17,6 @@ public class Player : MonoBehaviour {
     private float mouseVertical;
     private Vector3 velocity;
     private float verticalMomentum = 0f;
-    private bool jumpRequest;
 
     public Transform highlightBlock;
     public Transform placeHighlightBlock;
@@ -28,11 +25,12 @@ public class Player : MonoBehaviour {
 
     public byte selectedBlockIndex = 1;
 
+    float pressedTime;
+    bool isPressedDown = false;
+
     private void Start() {
         cam = GameObject.Find("Main Camera").transform;
         world = GameObject.Find("World").GetComponent<World>();
-
-        Cursor.lockState = CursorLockMode.Locked;
     }
 
     private void Update() {
@@ -43,28 +41,23 @@ public class Player : MonoBehaviour {
     private void FixedUpdate() {
         CalculateVelocity();
 
-        if(jumpRequest)
-            Jump();
-
         transform.Rotate(Vector3.up * mouseHorizontal * world.settings.sensitivity);
         cam.Rotate(Vector3.right * -mouseVertical * world.settings.sensitivity);
         transform.Translate(velocity, Space.World);
     }
 
-    private void Jump() {
-        verticalMomentum = jumpForce;
-        isGrounded = false;
-        jumpRequest = false;
+    public void Jump() {
+        if(isGrounded) {
+            verticalMomentum = jumpForce;
+            isGrounded = false;
+        }
     }
 
     private void CalculateVelocity() {
         if(verticalMomentum > gravity)
             verticalMomentum += Time.fixedDeltaTime * gravity;
 
-        if(isSprinting)
-            velocity = ((transform.forward * vertical) + (transform.right * horizontal)) * Time.fixedDeltaTime * sprintSpeed;
-        else
-            velocity = ((transform.forward * vertical) + (transform.right * horizontal)) * Time.fixedDeltaTime * walkSpeed;
+        velocity = ((transform.forward * vertical) + (transform.right * horizontal)) * Time.fixedDeltaTime * walkSpeed;
 
         velocity += Vector3.up * verticalMomentum * Time.fixedDeltaTime;
 
@@ -80,27 +73,23 @@ public class Player : MonoBehaviour {
     }
 
     private void GetPlayerInputs() {
-        if(Input.GetKeyDown(KeyCode.Escape))
-            Application.Quit();
-
-        horizontal = Input.GetAxis("Horizontal");
-        vertical = Input.GetAxis("Vertical");
+        horizontal = SimpleInput.GetAxis("Horizontal");
+        vertical = SimpleInput.GetAxis("Vertical");
         mouseHorizontal = Input.GetAxis("Mouse X");
         mouseVertical = Input.GetAxis("Mouse Y");
 
-        if(Input.GetButtonDown("Sprint"))
-            isSprinting = true;
-        if(Input.GetButtonUp("Sprint"))
-            isSprinting = false;
-
-        if(isGrounded && Input.GetButtonDown("Jump"))
-            jumpRequest = true;
-
         if(highlightBlock.gameObject.activeSelf) {
-            if(Input.GetMouseButtonDown(0))
-                world.GetChunkFromVector3(highlightBlock.position).EditVoxel(highlightBlock.position, 0);
+            if(Input.GetMouseButtonDown(0)) {
+                pressedTime = Time.time;
+                isPressedDown = true;
+            }
 
-            if(Input.GetMouseButtonDown(1))
+            if(Input.GetMouseButton(0) && Time.time - pressedTime > 0.3f && isPressedDown) {
+                world.GetChunkFromVector3(highlightBlock.position).EditVoxel(highlightBlock.position, 0);
+                isPressedDown = false;
+            }
+
+            if(Input.GetMouseButtonDown(0))
                 world.GetChunkFromVector3(placeHighlightBlock.position).EditVoxel(placeHighlightBlock.position, selectedBlockIndex);
         }
     }
@@ -110,7 +99,7 @@ public class Player : MonoBehaviour {
         Vector3 lastPos = new Vector3();
 
         while(step < reach) {
-            Vector3 pos = cam.position + (cam.forward * step);
+            Vector3 pos = cam.position + (Camera.main.ScreenPointToRay(Input.mousePosition).direction * step);
 
             if(world.CheckForVoxel(pos)) {
                 highlightBlock.position = new Vector3(Mathf.FloorToInt(pos.x), Mathf.FloorToInt(pos.y), Mathf.FloorToInt(pos.z));

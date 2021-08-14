@@ -10,8 +10,6 @@ public class Toolbar : MonoBehaviour {
     public RectTransform highlight;
     public ItemSlot[] itemSlots;
 
-    int slotIndex = 0;
-
     private void Start() {
         world = GameObject.Find("World").GetComponent<World>();
 
@@ -20,26 +18,12 @@ public class Toolbar : MonoBehaviour {
             slot.icon.enabled = true;
         }
 
-        player.selectedBlockIndex = itemSlots[slotIndex].itemID;
+        player.selectedBlockIndex = itemSlots[0].itemID;
     }
 
-    private void Update() {
-        float scroll = Input.GetAxis("Mouse ScrollWheel");
-
-        if(scroll != 0) {
-            if(scroll > 0)
-                slotIndex--;
-            else
-                slotIndex++;
-
-            if(slotIndex > itemSlots.Length - 1)
-                slotIndex = 0;
-            if(slotIndex < 0)
-                slotIndex = itemSlots.Length - 1;
-
-            highlight.position = itemSlots[slotIndex].icon.transform.position;
-            player.selectedBlockIndex = itemSlots[slotIndex].itemID;
-        }
+    public void Select(int index) {
+        highlight.position = itemSlots[index].icon.transform.position;
+        player.selectedBlockIndex = itemSlots[index].itemID;
     }
 }
 
