@@ -33,7 +33,11 @@ public class World : MonoBehaviour {
     Thread chunkUpdateThread;
     public object ChunkUpdateThreadLock = new object();
 
+    Camera cam;
+
     private void Start() {
+        cam = GameObject.Find("Main Camera").GetComponent<Camera>();
+
         string jsonImport = File.ReadAllText(Application.dataPath + "/settings.cfg");
         settings = JsonUtility.FromJson<Settings>(jsonImport);
 
@@ -54,7 +58,7 @@ public class World : MonoBehaviour {
 
     public void SetGlobalLightValue() {
         Shader.SetGlobalFloat("GlobalLightLevel", globalLightLevel);
-        Camera.main.backgroundColor = Color.Lerp(night, day, globalLightLevel);
+        cam.backgroundColor = Color.Lerp(night, day, globalLightLevel);
     }
 
     private void Update() {

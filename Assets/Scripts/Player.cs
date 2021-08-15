@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class Player : MonoBehaviour {
     public float walkSpeed = 3f;
@@ -9,7 +10,8 @@ public class Player : MonoBehaviour {
     public float playerWidth = 0.15f;
     public bool isGrounded;
 
-    private Transform cam;
+    private Camera cam;
+    private float camXRotation = 0f;
     private World world;
     private float horizontal;
     private float vertical;
@@ -29,7 +31,7 @@ public class Player : MonoBehaviour {
     bool isPressedDown = false;
 
     private void Start() {
-        cam = GameObject.Find("Main Camera").transform;
+        cam = GameObject.Find("Main Camera").GetComponent<Camera>();
         world = GameObject.Find("World").GetComponent<World>();
     }
 
@@ -40,10 +42,6 @@ public class Player : MonoBehaviour {
 
     private void FixedUpdate() {
         CalculateVelocity();
-
-        transform.Rotate(Vector3.up * mouseHorizontal * world.settings.sensitivity);
-        cam.Rotate(Vector3.right * -mouseVertical * world.settings.sensitivity);
-        transform.Translate(velocity, Space.World);
     }
 
     public void Jump() {
@@ -75,22 +73,33 @@ public class Player : MonoBehaviour {
     private void GetPlayerInputs() {
         horizontal = SimpleInput.GetAxis("Horizontal");
         vertical = SimpleInput.GetAxis("Vertical");
-        mouseHorizontal = Input.GetAxis("Mouse X");
-        mouseVertical = Input.GetAxis("Mouse Y");
+        mouseHorizontal = Input.GetAxis("Mouse X") * Time.deltaTime;
+        mouseVertical = Input.GetAxis("Mouse Y") * Time.deltaTime;
 
-        if(highlightBlock.gameObject.activeSelf) {
-            if(Input.GetMouseButtonDown(0)) {
-                pressedTime = Time.time;
-                isPressedDown = true;
+        transform.Rotate(Vector3.up * mouseHorizontal * world.settings.sensitivity);
+        camXRotation -= mouseVertical * world.settings.sensitivity;
+        camXRotation = Mathf.Clamp(camXRotation, -90f, 90f);
+        cam.transform.localRotation = Quaternion.Euler(camXRotation, 0f, 0f);
+
+        transform.Translate(velocity, Space.World);
+
+        if(!IsPointerOverUIObject()) {
+            if(highlightBlock.gameObject.activeSelf) {
+                if(Input.GetMouseButtonDown(0)) {
+                    isPressedDown = true;
+                    pressedTime = Time.time;
+                }
+
+                if(isPressedDown && Input.GetMouseButtonUp(0)) {
+                    world.GetChunkFromVector3(placeHighlightBlock.position).EditVoxel(placeHighlightBlock.position, selectedBlockIndex);
+                    isPressedDown = false;
+                }
+
+                if(isPressedDown && Time.time - pressedTime >= 0.3f) {
+                    world.GetChunkFromVector3(highlightBlock.position).EditVoxel(highlightBlock.position, 0);
+                    isPressedDown = false;
+                }
             }
-
-            if(Input.GetMouseButton(0) && Time.time - pressedTime > 0.3f && isPressedDown) {
-                world.GetChunkFromVector3(highlightBlock.position).EditVoxel(highlightBlock.position, 0);
-                isPressedDown = false;
-            }
-
-            if(Input.GetMouseButtonDown(0))
-                world.GetChunkFromVector3(placeHighlightBlock.position).EditVoxel(placeHighlightBlock.position, selectedBlockIndex);
         }
     }
 
@@ -99,14 +108,13 @@ public class Player : MonoBehaviour {
         Vector3 lastPos = new Vector3();
 
         while(step < reach) {
-            Vector3 pos = cam.position + (Camera.main.ScreenPointToRay(Input.mousePosition).direction * step);
+            Vector3 pos = cam.transform.position + (cam.ScreenPointToRay(Input.mousePosition).direction * step);
 
             if(world.CheckForVoxel(pos)) {
                 highlightBlock.position = new Vector3(Mathf.FloorToInt(pos.x), Mathf.FloorToInt(pos.y), Mathf.FloorToInt(pos.z));
                 placeHighlightBlock.position = lastPos;
 
                 highlightBlock.gameObject.SetActive(true);
-                placeHighlightBlock.gameObject.SetActive(true);
 
                 return;
             }
@@ -117,7 +125,6 @@ public class Player : MonoBehaviour {
         }
 
         highlightBlock.gameObject.SetActive(false);
-        placeHighlightBlock.gameObject.SetActive(false);
     }
 
     private float CheckDownSpeed(float downSpeed) {
@@ -181,5 +188,13 @@ public class Player : MonoBehaviour {
             else
                 return false;
         }
+    }
+
+    bool IsPointerOverUIObject() {
+        PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
+        eventDataCurrentPosition.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+        List<RaycastResult> results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
+        return results.Count > 0;
     }
 }
