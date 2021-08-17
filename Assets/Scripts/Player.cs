@@ -19,6 +19,7 @@ public class Player : MonoBehaviour {
     private float mouseVertical;
     private Vector3 velocity;
     private float verticalMomentum = 0f;
+    private bool jumpRequest = false;
 
     public Transform highlightBlock;
     public Transform placeHighlightBlock;
@@ -42,13 +43,26 @@ public class Player : MonoBehaviour {
 
     private void FixedUpdate() {
         CalculateVelocity();
+
+        if(jumpRequest)
+            Jump();
+
+        transform.Rotate(Vector3.up * mouseHorizontal * world.settings.sensitivity);
+        camXRotation -= mouseVertical * world.settings.sensitivity;
+        camXRotation = Mathf.Clamp(camXRotation, -90f, 90f);
+        cam.transform.localRotation = Quaternion.Euler(camXRotation, 0f, 0f);
+        transform.Translate(velocity, Space.World);
     }
 
-    public void Jump() {
-        if(isGrounded) {
-            verticalMomentum = jumpForce;
-            isGrounded = false;
-        }
+    private void Jump() {
+        verticalMomentum = jumpForce;
+        isGrounded = false;
+        jumpRequest = false;
+    }
+
+    public void RequestJump() {
+        if(isGrounded)
+            jumpRequest = true;
     }
 
     private void CalculateVelocity() {
@@ -73,15 +87,8 @@ public class Player : MonoBehaviour {
     private void GetPlayerInputs() {
         horizontal = SimpleInput.GetAxis("Horizontal");
         vertical = SimpleInput.GetAxis("Vertical");
-        mouseHorizontal = Input.GetAxis("Mouse X") * Time.deltaTime;
-        mouseVertical = Input.GetAxis("Mouse Y") * Time.deltaTime;
-
-        transform.Rotate(Vector3.up * mouseHorizontal * world.settings.sensitivity);
-        camXRotation -= mouseVertical * world.settings.sensitivity;
-        camXRotation = Mathf.Clamp(camXRotation, -90f, 90f);
-        cam.transform.localRotation = Quaternion.Euler(camXRotation, 0f, 0f);
-
-        transform.Translate(velocity, Space.World);
+        mouseHorizontal = Input.GetAxis("Mouse X");
+        mouseVertical = Input.GetAxis("Mouse Y");
 
         if(!IsPointerOverUIObject()) {
             if(highlightBlock.gameObject.activeSelf) {

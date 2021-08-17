@@ -207,6 +207,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   settings:
+    loadDistance: 16
     viewDistance: 8
     animatedChunks: 1
     sensitivity: 3
@@ -377,6 +378,10 @@ MonoBehaviour:
     leftFaceTexture: 14
     rightFaceTexture: 14
   debugScreen: {fileID: 1104636294}
+  worldData:
+    worldName: 
+    seed: 0
+  appPath: 
 --- !u!4 &200495559
 Transform:
   m_ObjectHideFlags: 0
@@ -2276,7 +2281,7 @@ MonoBehaviour:
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
     m_SelectOnRight: {fileID: 0}
-  m_Transition: 1
+  m_Transition: 0
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
     m_HighlightedColor: {r: 1, g: 1, b: 1, a: 1}
@@ -2303,7 +2308,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 702510117}
         m_TargetAssemblyTypeName: Player, Assembly-CSharp
-        m_MethodName: Jump
+        m_MethodName: RequestJump
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2334,7 +2339,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_Sprite: {fileID: 21300000, guid: 9c556e873e9c71c42a3df3d78817fb54, type: 3}
-  m_Type: 1
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
