@@ -42,3 +42,10 @@ MonoBehaviour:
     scale: 0.2
     threshold: 0.6
     noiseOffset: 500
+  - lodeName: Cave
+    blockID: 0
+    minHeight: 5
+    maxHeight: 60
+    scale: 0.1
+    threshold: 0.55
+    noiseOffset: 56445

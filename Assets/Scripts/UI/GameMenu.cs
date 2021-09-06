@@ -24,6 +24,10 @@ public class GameMenu : MonoBehaviour {
         }
     }
 
+    public void SaveGame() {
+        SaveSystem.SaveWorld(World.Instance.worldData);
+    }
+
     public void MainMenu() {
         SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
     }

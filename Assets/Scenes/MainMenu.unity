@@ -537,7 +537,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 6498821482066543588, guid: 910b14636ff2ebf448e2deba1eaf16b1, type: 3}
       propertyPath: m_Value
-      value: 0.5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6498821482066543588, guid: 910b14636ff2ebf448e2deba1eaf16b1, type: 3}
       propertyPath: m_MaxValue
@@ -545,7 +545,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6498821482066543588, guid: 910b14636ff2ebf448e2deba1eaf16b1, type: 3}
       propertyPath: m_MinValue
-      value: 0.5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6498821482066543588, guid: 910b14636ff2ebf448e2deba1eaf16b1, type: 3}
       propertyPath: m_Transition
@@ -2024,7 +2024,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6498821482066543588, guid: 910b14636ff2ebf448e2deba1eaf16b1, type: 3}
       propertyPath: m_MaxValue
-      value: 32
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 6498821482066543588, guid: 910b14636ff2ebf448e2deba1eaf16b1, type: 3}
       propertyPath: m_MinValue

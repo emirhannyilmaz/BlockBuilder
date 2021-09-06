@@ -20,19 +20,18 @@ public class TitleMenu : MonoBehaviour {
     Settings settings;
 
     private void Awake() {
-        if(!File.Exists(Application.dataPath + "/settings.cfg")) {
+        if(!File.Exists(Application.persistentDataPath + Path.DirectorySeparatorChar + "settings.cfg")) {
             settings = new Settings();
 
             string jsonExport = JsonUtility.ToJson(settings);
-            File.WriteAllText(Application.dataPath + "/settings.cfg", jsonExport);
+            File.WriteAllText(Application.persistentDataPath + Path.DirectorySeparatorChar + "settings.cfg", jsonExport);
         } else {
-            string jsonImport = File.ReadAllText(Application.dataPath + "/settings.cfg");
+            string jsonImport = File.ReadAllText(Application.persistentDataPath + Path.DirectorySeparatorChar + "settings.cfg");
             settings = JsonUtility.FromJson<Settings>(jsonImport);
         }
     }
 
     public void StartGame() {
-        VoxelData.seed = Random.Range(136454, 763231);
         SceneManager.LoadScene("Game", LoadSceneMode.Single);
     }
 
@@ -49,11 +48,12 @@ public class TitleMenu : MonoBehaviour {
 
     public void LeaveSettings() {
         settings.viewDistance = (int) viewDistanceSlider.value;
+        settings.loadDistance = settings.viewDistance * 2;
         settings.sensitivity = sensitivitySlider.value;
         settings.animatedChunks = animatedChunksToggle.isOn;
 
         string jsonExport = JsonUtility.ToJson(settings);
-        File.WriteAllText(Application.dataPath + "/settings.cfg", jsonExport);
+        File.WriteAllText(Application.persistentDataPath + Path.DirectorySeparatorChar + "settings.cfg", jsonExport);
 
         mainMenu.SetActive(true);
         settingsMenu.SetActive(false);

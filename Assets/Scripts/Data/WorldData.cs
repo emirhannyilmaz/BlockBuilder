@@ -6,6 +6,11 @@ using UnityEngine;
 public class WorldData {
     public string worldName = "New World";
     public int seed;
+    public float playerX;
+    public float playerY;
+    public float playerZ;
+    public float playerRotY;
+    public float cameraRotX;
 
     [System.NonSerialized]
     public Dictionary<Vector2Int, ChunkData> chunks = new Dictionary<Vector2Int, ChunkData>();
@@ -18,14 +23,22 @@ public class WorldData {
             modifiedChunks.Add(chunkData);
     }
 
-    public WorldData(string _worldName, int _seed) {
+    public WorldData(string _worldName) {
         worldName = _worldName;
-        seed = _seed;
+        seed = Random.Range(1234, 9876);
+        playerX = (VoxelData.WorldSizeInChunks * VoxelData.ChunkWidth) / 2f;
+        playerY = VoxelData.ChunkHeight - 50f;
+        playerZ = (VoxelData.WorldSizeInChunks * VoxelData.ChunkWidth) / 2f;
     }
 
     public WorldData(WorldData worldData) {
         worldName = worldData.worldName;
         seed = worldData.seed;
+        playerX = worldData.playerX;
+        playerY = worldData.playerY;
+        playerZ = worldData.playerZ;
+        playerRotY = worldData.playerRotY;
+        cameraRotX = worldData.cameraRotX;
     }
 
     public ChunkData RequestChunk(Vector2Int coord, bool create) {
@@ -56,7 +69,7 @@ public class WorldData {
             return;
         }
 
-        chunks.Add(coord, new ChunkData(coord));
+        chunks.Add(coord, new ChunkData(coord.x * VoxelData.ChunkWidth, coord.y * VoxelData.ChunkWidth));
         chunks[coord].Populate();
     }
 
@@ -74,10 +87,10 @@ public class WorldData {
         int x = Mathf.FloorToInt(pos.x / VoxelData.ChunkWidth);
         int z = Mathf.FloorToInt(pos.z / VoxelData.ChunkWidth);
 
+        ChunkData chunk = RequestChunk(new Vector2Int(x, z), true);
+
         x *= VoxelData.ChunkWidth;
         z *= VoxelData.ChunkWidth;
-
-        ChunkData chunk = RequestChunk(new Vector2Int(x, z), true);
 
         Vector3Int voxel = new Vector3Int((int) (pos.x - x), (int) pos.y, (int) (pos.z - z));
 
@@ -92,10 +105,10 @@ public class WorldData {
         int x = Mathf.FloorToInt(pos.x / VoxelData.ChunkWidth);
         int z = Mathf.FloorToInt(pos.z / VoxelData.ChunkWidth);
 
+        ChunkData chunk = RequestChunk(new Vector2Int(x, z), true);
+
         x *= VoxelData.ChunkWidth;
         z *= VoxelData.ChunkWidth;
-
-        ChunkData chunk = RequestChunk(new Vector2Int(x, z), true);
 
         Vector3Int voxel = new Vector3Int((int) (pos.x - x), (int) pos.y, (int) (pos.z - z));
 

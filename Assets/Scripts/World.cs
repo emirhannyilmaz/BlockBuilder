@@ -7,12 +7,7 @@ using System.IO;
 public class World : MonoBehaviour {
     public Settings settings;
     public BiomeAttributes[] biomes;
-    [Range(0f, 1f)]
-    public float globalLightLevel;
-    public Color day;
-    public Color night;
     public Transform player;
-    public Vector3 spawnPosition;
     public Material material;
     public Material transparentMaterial;
     public BlockType[] blockTypes;
@@ -20,7 +15,6 @@ public class World : MonoBehaviour {
     List<ChunkCoord> activeChunks = new List<ChunkCoord>();
     public ChunkCoord playerChunkCoord;
     ChunkCoord playerLastChunkCoord;
-    List<ChunkCoord> chunksToCreate = new List<ChunkCoord>();
     public List<Chunk> chunksToUpdate = new List<Chunk>();
     public Queue<Chunk> chunksToDraw = new Queue<Chunk>();
 
@@ -60,27 +54,20 @@ public class World : MonoBehaviour {
         worldData = SaveSystem.LoadWorld("New World");
         cam = GameObject.Find("Main Camera").GetComponent<Camera>();
 
-        string jsonImport = File.ReadAllText(Application.dataPath + "/settings.cfg");
+        string jsonImport = File.ReadAllText(appPath + Path.DirectorySeparatorChar + "settings.cfg");
         settings = JsonUtility.FromJson<Settings>(jsonImport);
 
-        Random.InitState(VoxelData.seed);
+        Random.InitState(worldData.seed);
 
-        Shader.SetGlobalFloat("minGlobalLightLevel", VoxelData.minLightLevel);
-        Shader.SetGlobalFloat("maxGlobalLightLevel", VoxelData.maxLightLevel);
+        LoadWorld();
+
+        player.SetPositionAndRotation(new Vector3(worldData.playerX, worldData.playerY, worldData.playerZ), Quaternion.Euler(0f, worldData.playerRotY, 0f));
+        player.gameObject.GetComponent<Player>().camXRotation = worldData.cameraRotX;
+        CheckViewDistance();
+        playerLastChunkCoord = GetChunkCoordFromVector3(player.position);
 
         chunkUpdateThread = new Thread(new ThreadStart(ThreadedUpdate));
         chunkUpdateThread.Start();
-
-        SetGlobalLightValue();
-
-        spawnPosition = new Vector3((VoxelData.WorldSizeInChunks * VoxelData.ChunkWidth) / 2f, VoxelData.ChunkHeight - 50f, (VoxelData.WorldSizeInChunks * VoxelData.ChunkWidth) / 2f);
-        GenerateWorld();
-        playerLastChunkCoord = GetChunkCoordFromVector3(player.position);
-    }
-
-    public void SetGlobalLightValue() {
-        Shader.SetGlobalFloat("GlobalLightLevel", globalLightLevel);
-        cam.backgroundColor = Color.Lerp(night, day, globalLightLevel);
     }
 
     private void Update() {
@@ -89,17 +76,11 @@ public class World : MonoBehaviour {
         if(!playerChunkCoord.Equals(playerLastChunkCoord))
             CheckViewDistance();
 
-        if(chunksToCreate.Count > 0)
-            CreateChunk();
-
         if(chunksToDraw.Count > 0)
             chunksToDraw.Dequeue().CreateMesh();
 
         if(Input.GetKeyDown(KeyCode.F3))
             debugScreen.SetActive(!debugScreen.activeSelf);
-
-        if(Input.GetKeyDown(KeyCode.G))
-            SaveSystem.SaveWorld(worldData);
     }
 
     void LoadWorld() {
@@ -108,26 +89,6 @@ public class World : MonoBehaviour {
                 worldData.LoadChunk(new Vector2Int(x, z));
             }
         }
-    }
-
-    void GenerateWorld() {
-        for(int x = (VoxelData.WorldSizeInChunks / 2) - settings.viewDistance; x < (VoxelData.WorldSizeInChunks / 2) + settings.viewDistance; x++) {
-            for(int z = (VoxelData.WorldSizeInChunks / 2) - settings.viewDistance; z < (VoxelData.WorldSizeInChunks / 2) + settings.viewDistance; z++) {
-                ChunkCoord newChunk = new ChunkCoord(x, z);
-                chunks[x, z] = new Chunk(newChunk);
-                chunksToCreate.Add(newChunk);
-            }
-        }
-
-        player.position = spawnPosition;
-
-        CheckViewDistance();
-    }
-
-    void CreateChunk() {
-        ChunkCoord c = chunksToCreate[0];
-        chunksToCreate.RemoveAt(0);
-        chunks[c.x, c.z].Init();
     }
 
     void UpdateChunks() {
@@ -193,12 +154,10 @@ public class World : MonoBehaviour {
                 ChunkCoord thisChunkCoord = new ChunkCoord(x, z);
 
                 if(IsChunkInWorld(thisChunkCoord)) {
-                    if(chunks[x, z] == null) {
+                    if(chunks[x, z] == null)
                         chunks[x, z] = new Chunk(thisChunkCoord);
-                        chunksToCreate.Add(thisChunkCoord);
-                    } else if(!chunks[x, z].isActive) {
-                        chunks[x, z].isActive = true;
-                    }
+
+                    chunks[x, z].isActive = true;
                     activeChunks.Add(thisChunkCoord);
                 }
 
@@ -370,6 +329,5 @@ public class Settings {
     public bool animatedChunks = true;
 
     [Header("Controls")]
-    [Range(0.5f, 10f)]
-    public float sensitivity = 3f;
+    public float sensitivity = 1f;
 }

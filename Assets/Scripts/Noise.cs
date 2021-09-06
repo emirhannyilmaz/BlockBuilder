@@ -4,15 +4,15 @@ using UnityEngine;
 
 public static class Noise {
     public static float Get2DPerlin(Vector2 position, float offset, float scale) {
-        position.x += (offset + VoxelData.seed + 0.1f);
-        position.y += (offset + VoxelData.seed + 0.1f);
+        position.x += (offset + World.Instance.worldData.seed + 0.1f);
+        position.y += (offset + World.Instance.worldData.seed + 0.1f);
         return Mathf.PerlinNoise(position.x / VoxelData.ChunkWidth * scale, position.y / VoxelData.ChunkWidth * scale);
     }
 
     public static bool Get3DPerlin(Vector3 position, float offset, float scale, float threshold) {
-        float x = (position.x + offset + VoxelData.seed + 0.1f) * scale;
-        float y = (position.y + offset + VoxelData.seed + 0.1f) * scale;
-        float z = (position.z + offset + VoxelData.seed + 0.1f) * scale;
+        float x = (position.x + offset + World.Instance.worldData.seed + 0.1f) * scale;
+        float y = (position.y + offset + World.Instance.worldData.seed + 0.1f) * scale;
+        float z = (position.z + offset + World.Instance.worldData.seed + 0.1f) * scale;
 
         float AB = Mathf.PerlinNoise(x, y);
         float BC = Mathf.PerlinNoise(y, z);

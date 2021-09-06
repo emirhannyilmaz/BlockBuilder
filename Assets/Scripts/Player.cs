@@ -11,7 +11,7 @@ public class Player : MonoBehaviour {
     public bool isGrounded;
 
     private Camera cam;
-    private float camXRotation = 0f;
+    public float camXRotation = 0f;
     private World world;
     private float horizontal;
     private float vertical;
@@ -31,6 +31,10 @@ public class Player : MonoBehaviour {
     float pressedTime;
     bool isPressedDown = false;
 
+    private Touch currentPointer;
+    private Vector3 highlightBlockStart;
+    private bool destroyingMode = false;
+
     private void Start() {
         cam = GameObject.Find("Main Camera").GetComponent<Camera>();
         world = GameObject.Find("World").GetComponent<World>();
@@ -38,7 +42,6 @@ public class Player : MonoBehaviour {
 
     private void Update() {
         GetPlayerInputs();
-        PlaceCursorBlocks();
     }
 
     private void FixedUpdate() {
@@ -47,8 +50,8 @@ public class Player : MonoBehaviour {
         if(jumpRequest)
             Jump();
 
-        transform.Rotate(Vector3.up * mouseHorizontal * world.settings.sensitivity);
-        camXRotation -= mouseVertical * world.settings.sensitivity;
+        transform.Rotate(Vector3.up * (mouseHorizontal * 0.1f) * world.settings.sensitivity);
+        camXRotation -= (mouseVertical * 0.1f) * world.settings.sensitivity;
         camXRotation = Mathf.Clamp(camXRotation, -90f, 90f);
         cam.transform.localRotation = Quaternion.Euler(camXRotation, 0f, 0f);
         transform.Translate(velocity, Space.World);
@@ -87,24 +90,58 @@ public class Player : MonoBehaviour {
     private void GetPlayerInputs() {
         horizontal = SimpleInput.GetAxis("Horizontal");
         vertical = SimpleInput.GetAxis("Vertical");
-        mouseHorizontal = Input.GetAxis("Mouse X");
-        mouseVertical = Input.GetAxis("Mouse Y");
 
-        if(!IsPointerOverUIObject()) {
-            if(highlightBlock.gameObject.activeSelf) {
-                if(Input.GetMouseButtonDown(0)) {
-                    isPressedDown = true;
-                    pressedTime = Time.time;
-                }
+        if(Input.touchCount > 0) {
+            foreach(Touch t in Input.touches) {
+                if(!IsPointerOverUIObject(t)) {
+                    if(t.phase == TouchPhase.Began) {
+                        currentPointer = t;
+                        PlaceCursorBlocks();
 
-                if(isPressedDown && Input.GetMouseButtonUp(0)) {
-                    world.GetChunkFromVector3(placeHighlightBlock.position).EditVoxel(placeHighlightBlock.position, selectedBlockIndex);
-                    isPressedDown = false;
-                }
+                        if(highlightBlock.gameObject.activeSelf) {
+                            isPressedDown = true;
+                            pressedTime = Time.time;
+                            highlightBlockStart = highlightBlock.position;
+                        }
+                    }
 
-                if(isPressedDown && Time.time - pressedTime >= 0.3f) {
-                    world.GetChunkFromVector3(highlightBlock.position).EditVoxel(highlightBlock.position, 0);
-                    isPressedDown = false;
+                    if(t.phase == TouchPhase.Moved) {
+                        mouseHorizontal = t.deltaPosition.x;
+                        mouseVertical = t.deltaPosition.y;
+                        PlaceCursorBlocks();
+                    }
+
+                    if(t.phase == TouchPhase.Stationary) {
+                        if(highlightBlock.gameObject.activeSelf) {
+                            if(Time.time - pressedTime >= 0.5f && isPressedDown && (highlightBlockStart == highlightBlock.position || destroyingMode)) {
+                                world.GetChunkFromVector3(highlightBlock.position).EditVoxel(highlightBlock.position, 0);
+                                destroyingMode = true;
+                                pressedTime = Time.time;
+                            }
+                        }
+
+                        mouseHorizontal = 0f;
+                        mouseVertical = 0f;
+                    }
+
+                    if(t.phase == TouchPhase.Ended) {
+                        if(highlightBlock.gameObject.activeSelf) {
+                            if(isPressedDown) {
+                                if(!destroyingMode && highlightBlockStart == highlightBlock.position) {
+                                    world.GetChunkFromVector3(placeHighlightBlock.position).EditVoxel(placeHighlightBlock.position, selectedBlockIndex);
+                                    isPressedDown = false;
+                                    PlaceCursorBlocks();
+                                } else if(destroyingMode) {
+                                    isPressedDown = false;
+                                    destroyingMode = false;
+                                    PlaceCursorBlocks();
+                                }
+                            }
+                        }
+
+                        mouseHorizontal = 0f;
+                        mouseVertical = 0f;
+                    }
                 }
             }
         }
@@ -115,7 +152,7 @@ public class Player : MonoBehaviour {
         Vector3 lastPos = new Vector3();
 
         while(step < reach) {
-            Vector3 pos = cam.transform.position + (cam.ScreenPointToRay(Input.mousePosition).direction * step);
+            Vector3 pos = cam.transform.position + (cam.ScreenPointToRay(currentPointer.position).direction * step);
 
             if(world.CheckForVoxel(pos)) {
                 highlightBlock.position = new Vector3(Mathf.FloorToInt(pos.x), Mathf.FloorToInt(pos.y), Mathf.FloorToInt(pos.z));
@@ -197,9 +234,9 @@ public class Player : MonoBehaviour {
         }
     }
 
-    bool IsPointerOverUIObject() {
+    bool IsPointerOverUIObject(Touch touch) {
         PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
-        eventDataCurrentPosition.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+        eventDataCurrentPosition.position = new Vector2(touch.position.x, touch.position.y);
         List<RaycastResult> results = new List<RaycastResult>();
         EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
         return results.Count > 0;
