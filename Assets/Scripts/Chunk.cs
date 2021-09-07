@@ -5,7 +5,7 @@ using UnityEngine;
 public class Chunk {
     public ChunkCoord coord;
 
-    GameObject chunkObject;
+    public GameObject chunkObject;
     MeshRenderer meshRenderer;
     MeshFilter meshFilter;
 
@@ -44,8 +44,10 @@ public class Chunk {
         lock(World.Instance.ChunkUpdateThreadLock)
             World.Instance.chunksToUpdate.Add(this);
 
-        if(World.Instance.settings.animatedChunks)
+        if(World.Instance.settings.animatedChunks) {
             chunkObject.AddComponent<ChunkLoadAnimation>();
+            chunkObject.GetComponent<ChunkLoadAnimation>().direction = DIRECTION.UP;
+        }
     }
 
     public void UpdateChunk() {
@@ -75,8 +77,16 @@ public class Chunk {
         get { return _isActive; }
         set {
             _isActive = value;
-            if(chunkObject != null)
-                chunkObject.SetActive(value);
+            if(World.Instance.settings.animatedChunks) {
+                if(value) {
+                    chunkObject.GetComponent<ChunkLoadAnimation>().direction = DIRECTION.UP;
+                } else {
+                    chunkObject.GetComponent<ChunkLoadAnimation>().direction = DIRECTION.DOWN;
+                }
+            } else {
+                if(chunkObject != null)
+                    chunkObject.SetActive(value);
+            }
         }
     }
 
