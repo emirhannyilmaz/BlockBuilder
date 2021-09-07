@@ -52,7 +52,7 @@ public class World : MonoBehaviour {
 
     private void Start() {
         worldData = SaveSystem.LoadWorld("New World");
-        cam = GameObject.Find("Main Camera").GetComponent<Camera>();
+        cam = Camera.main;
 
         string jsonImport = File.ReadAllText(appPath + Path.DirectorySeparatorChar + "settings.cfg");
         settings = JsonUtility.FromJson<Settings>(jsonImport);

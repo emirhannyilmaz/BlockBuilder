@@ -216,7 +216,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 44434779c14b1644d837458f5e2d044b, type: 2}
   - {fileID: 11400000, guid: 3559e7f225fe973409630e4cd2ced15b, type: 2}
   player: {fileID: 702510116}
-  spawnPosition: {x: 0, y: 0, z: 0}
   material: {fileID: 2100000, guid: fcfe61abd4d0202448b38b90fc1b3da7, type: 2}
   transparentMaterial: {fileID: 2100000, guid: 052606774abdc154fa58d735daf7fe02, type: 2}
   blockTypes:
@@ -378,6 +377,11 @@ MonoBehaviour:
   worldData:
     worldName: 
     seed: 0
+    playerX: 0
+    playerY: 0
+    playerZ: 0
+    playerRotY: 0
+    cameraRotX: 0
   appPath: 
 --- !u!4 &200495559
 Transform:
@@ -1386,6 +1390,7 @@ MonoBehaviour:
   gravity: -9.8
   playerWidth: 0.25
   isGrounded: 0
+  camXRotation: 0
   highlightBlock: {fileID: 1311125443}
   placeHighlightBlock: {fileID: 1242900757}
   checkIncrement: 0.1

@@ -50,7 +50,7 @@ public class Player : MonoBehaviour {
         if(jumpRequest)
             Jump();
 
-        transform.Rotate(Vector3.up * (mouseHorizontal * 0.1f) * world.settings.sensitivity);
+        transform.Rotate((mouseHorizontal * 0.1f) * world.settings.sensitivity * Vector3.up);
         camXRotation -= (mouseVertical * 0.1f) * world.settings.sensitivity;
         camXRotation = Mathf.Clamp(camXRotation, -90f, 90f);
         cam.transform.localRotation = Quaternion.Euler(camXRotation, 0f, 0f);
@@ -72,9 +72,9 @@ public class Player : MonoBehaviour {
         if(verticalMomentum > gravity)
             verticalMomentum += Time.fixedDeltaTime * gravity;
 
-        velocity = ((transform.forward * vertical) + (transform.right * horizontal)) * Time.fixedDeltaTime * walkSpeed;
+        velocity = Time.fixedDeltaTime * walkSpeed * ((transform.forward * vertical) + (transform.right * horizontal));
 
-        velocity += Vector3.up * verticalMomentum * Time.fixedDeltaTime;
+        velocity += Time.fixedDeltaTime * verticalMomentum * Vector3.up;
 
         if((velocity.z > 0 && front) || (velocity.z < 0 && back))
             velocity.z = 0f;
@@ -142,6 +142,9 @@ public class Player : MonoBehaviour {
                         mouseHorizontal = 0f;
                         mouseVertical = 0f;
                     }
+                } else {
+                    mouseHorizontal = 0f;
+                    mouseVertical = 0f;
                 }
             }
         }
