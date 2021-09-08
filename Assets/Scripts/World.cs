@@ -60,7 +60,6 @@ public class World : MonoBehaviour {
         Random.InitState(worldData.seed);
 
         LoadWorld();
-
         player.SetPositionAndRotation(new Vector3(worldData.playerX, worldData.playerY, worldData.playerZ), Quaternion.Euler(0f, worldData.playerRotY, 0f));
         player.gameObject.GetComponent<Player>().camXRotation = worldData.cameraRotX;
         CheckViewDistance();
@@ -119,10 +118,33 @@ public class World : MonoBehaviour {
 
         while(modifications.Count > 0) {
             Queue<VoxelMod> queue = modifications.Dequeue();
-            while(queue.Count > 0) {
-                VoxelMod v = queue.Dequeue();
+            bool dontCreate = false;
 
-                worldData.SetVoxel(v.position, v.id);
+            Queue<VoxelMod> newQueue = new Queue<VoxelMod>(queue);
+
+            while(newQueue.Count > 0) {
+                VoxelMod v = newQueue.Dequeue();
+
+                int x = Mathf.FloorToInt(v.position.x / VoxelData.ChunkWidth);
+                int z = Mathf.FloorToInt(v.position.z / VoxelData.ChunkWidth);
+
+                ChunkData chunkData = worldData.RequestChunk(new Vector2Int(x, z), false);
+
+                if(chunkData == null) {
+                    dontCreate = true;
+                    break;
+                }
+            }
+
+            newQueue.Clear();
+
+            if(!dontCreate) {
+                while(queue.Count > 0) {
+                    VoxelMod v = queue.Dequeue();
+                    worldData.SetVoxel(v.position, v.id);
+                }
+            } else {
+                queue.Clear();
             }
         }
 
@@ -148,7 +170,6 @@ public class World : MonoBehaviour {
 
         List<ChunkCoord> previouslyActiveChunks = new List<ChunkCoord>(activeChunks);
         activeChunks.Clear();
-
         for(int x = coord.x - settings.viewDistance; x < coord.x + settings.viewDistance; x++) {
             for(int z = coord.z - settings.viewDistance; z < coord.z + settings.viewDistance; z++) {
                 ChunkCoord thisChunkCoord = new ChunkCoord(x, z);

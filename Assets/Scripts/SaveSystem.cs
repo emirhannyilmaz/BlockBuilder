@@ -65,6 +65,7 @@ public static class SaveSystem {
         using(var w = new BinaryWriter(File.OpenWrite(savePath + chunkName + ".chunk"))) {
             w.Write(System.Convert.ToInt16(chunk.globalPosition.x));
             w.Write(System.Convert.ToInt16(chunk.globalPosition.y));
+
             for(int y = 0; y < VoxelData.ChunkHeight; y++) {
                 for(int x = 0; x < VoxelData.ChunkWidth; x++) {
                     for(int z = 0; z < VoxelData.ChunkWidth; z++) {
