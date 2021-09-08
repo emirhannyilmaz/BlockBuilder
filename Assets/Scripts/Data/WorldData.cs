@@ -31,14 +31,14 @@ public class WorldData {
         playerZ = (VoxelData.WorldSizeInChunks * VoxelData.ChunkWidth) / 2f;
     }
 
-    public WorldData(WorldData worldData) {
-        worldName = worldData.worldName;
-        seed = worldData.seed;
-        playerX = worldData.playerX;
-        playerY = worldData.playerY;
-        playerZ = worldData.playerZ;
-        playerRotY = worldData.playerRotY;
-        cameraRotX = worldData.cameraRotX;
+    public WorldData(string _worldName, int _seed, float _playerX, float _playerY, float _playerZ, float _playerRotY, float _cameraRotX) {
+        worldName = _worldName;
+        seed = _seed;
+        playerX = _playerX;
+        playerY = _playerY;
+        playerZ = _playerZ;
+        playerRotY = _playerRotY;
+        cameraRotX = _cameraRotX;
     }
 
     public ChunkData RequestChunk(Vector2Int coord, bool create) {

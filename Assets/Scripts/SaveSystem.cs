@@ -2,17 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 
 public static class SaveSystem {
     public static void SaveWorld(WorldData worldData) {
-        string savePath = World.Instance.appPath + Path.DirectorySeparatorChar + "saves" + Path.DirectorySeparatorChar + worldData.worldName + Path.DirectorySeparatorChar;
+        string savePath = TitleMenu.appPath + Path.DirectorySeparatorChar + "saves" + Path.DirectorySeparatorChar + worldData.worldName + Path.DirectorySeparatorChar;
 
         if(!Directory.Exists(savePath))
             Directory.CreateDirectory(savePath);
-
-        BinaryFormatter formatter = new BinaryFormatter();
-        FileStream stream = new FileStream(savePath + "world.world", FileMode.Create);
 
         worldData.playerX = World.Instance.player.position.x;
         worldData.playerY = World.Instance.player.position.y;
@@ -20,8 +16,15 @@ public static class SaveSystem {
         worldData.playerRotY = World.Instance.player.rotation.eulerAngles.y;
         worldData.cameraRotX = Camera.main.transform.localRotation.eulerAngles.x;
 
-        formatter.Serialize(stream, worldData);
-        stream.Close();
+        using(var w = new BinaryWriter(File.OpenWrite(savePath + "world.world"))) {
+            w.Write(System.Convert.ToString(worldData.worldName));
+            w.Write(System.Convert.ToInt16(worldData.seed));
+            w.Write(System.Convert.ToSingle(worldData.playerX));
+            w.Write(System.Convert.ToSingle(worldData.playerY));
+            w.Write(System.Convert.ToSingle(worldData.playerZ));
+            w.Write(System.Convert.ToSingle(worldData.playerRotY));
+            w.Write(System.Convert.ToSingle(worldData.cameraRotX));
+        }
 
         List<ChunkData> chunks = new List<ChunkData>(worldData.modifiedChunks);
         worldData.modifiedChunks.Clear();
@@ -32,16 +35,20 @@ public static class SaveSystem {
     }
 
     public static WorldData LoadWorld(string worldName) {
-        string loadPath = World.Instance.appPath + Path.DirectorySeparatorChar + "saves" + Path.DirectorySeparatorChar + worldName + Path.DirectorySeparatorChar;
+        string loadPath = TitleMenu.appPath + Path.DirectorySeparatorChar + "saves" + Path.DirectorySeparatorChar + worldName + Path.DirectorySeparatorChar;
 
         if(File.Exists(loadPath + "world.world")) {
-            BinaryFormatter formatter = new BinaryFormatter();
-            FileStream stream = new FileStream(loadPath + "world.world", FileMode.Open);
+            using(var r = new BinaryReader(File.OpenRead(loadPath + "world.world"))) {
+                string name = r.ReadString();
+                int seed = r.ReadInt16();
+                float playerX = r.ReadSingle();
+                float playerY = r.ReadSingle();
+                float playerZ = r.ReadSingle();
+                float playerRotY = r.ReadSingle();
+                float cameraRotX = r.ReadSingle();
 
-            WorldData worldData = formatter.Deserialize(stream) as WorldData;
-            stream.Close();
-
-            return new WorldData(worldData);
+                return new WorldData(name, seed, playerX, playerY, playerZ, playerRotY, cameraRotX);
+            }
         } else {
             WorldData worldData = new WorldData(worldName);
             return worldData;
@@ -50,32 +57,65 @@ public static class SaveSystem {
 
     public static void SaveChunk(ChunkData chunk, string worldName) {
         string chunkName = chunk.position.x + "-" + chunk.position.y;
-        string savePath = World.Instance.appPath + Path.DirectorySeparatorChar + "saves" + Path.DirectorySeparatorChar + worldName + Path.DirectorySeparatorChar + "chunks" + Path.DirectorySeparatorChar;
+        string savePath = TitleMenu.appPath + Path.DirectorySeparatorChar + "saves" + Path.DirectorySeparatorChar + worldName + Path.DirectorySeparatorChar + "chunks" + Path.DirectorySeparatorChar;
 
         if(!Directory.Exists(savePath))
             Directory.CreateDirectory(savePath);
 
-        BinaryFormatter formatter = new BinaryFormatter();
-        FileStream stream = new FileStream(savePath + chunkName + ".chunk", FileMode.Create);
-
-        formatter.Serialize(stream, chunk);
-        stream.Close();
+        using(var w = new BinaryWriter(File.OpenWrite(savePath + chunkName + ".chunk"))) {
+            w.Write(System.Convert.ToInt16(chunk.globalPosition.x));
+            w.Write(System.Convert.ToInt16(chunk.globalPosition.y));
+            for(int y = 0; y < VoxelData.ChunkHeight; y++) {
+                for(int x = 0; x < VoxelData.ChunkWidth; x++) {
+                    for(int z = 0; z < VoxelData.ChunkWidth; z++) {
+                        w.Write(System.Convert.ToByte(chunk.map[x, y, z].id));
+                    }
+                }
+            }
+        }
     }
 
     public static ChunkData LoadChunk(string worldName, Vector2Int position) {
         string chunkName = position.x + "-" + position.y;
-        string loadPath = World.Instance.appPath + Path.DirectorySeparatorChar + "saves" + Path.DirectorySeparatorChar + worldName + Path.DirectorySeparatorChar + "chunks" + Path.DirectorySeparatorChar;
+        string loadPath = TitleMenu.appPath + Path.DirectorySeparatorChar + "saves" + Path.DirectorySeparatorChar + worldName + Path.DirectorySeparatorChar + "chunks" + Path.DirectorySeparatorChar;
 
         if(File.Exists(loadPath + chunkName + ".chunk")) {
-            BinaryFormatter formatter = new BinaryFormatter();
-            FileStream stream = new FileStream(loadPath + chunkName + ".chunk", FileMode.Open);
+            using(var r = new BinaryReader(File.OpenRead(loadPath + chunkName + ".chunk"))) {
+                int cX = r.ReadInt16();
+                int cY = r.ReadInt16();
 
-            ChunkData chunkData = formatter.Deserialize(stream) as ChunkData;
-            stream.Close();
+                ChunkData chunkData = new ChunkData(cX, cY);
 
-            return chunkData;
+                for(int y = 0; y < VoxelData.ChunkHeight; y++) {
+                    for(int x = 0; x < VoxelData.ChunkWidth; x++) {
+                        for(int z = 0; z < VoxelData.ChunkWidth; z++) {
+                            chunkData.map[x, y, z] = new VoxelState(r.ReadByte());
+                        }
+                    }
+                }
+
+                return chunkData;
+            }
         }
 
         return null;
+    }
+
+    public static void ResetWorld(string worldName) {
+        string worldPath = TitleMenu.appPath + Path.DirectorySeparatorChar + "saves" + Path.DirectorySeparatorChar + worldName + Path.DirectorySeparatorChar;
+
+        if(Directory.Exists(worldPath)) {
+            Directory.Delete(worldPath, true);
+        }
+    }
+
+    public static bool CheckIfWorldExists(string worldName) {
+        string worldPath = TitleMenu.appPath + Path.DirectorySeparatorChar + "saves" + Path.DirectorySeparatorChar + worldName + Path.DirectorySeparatorChar;
+
+        if(Directory.Exists(worldPath)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

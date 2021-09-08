@@ -39,7 +39,7 @@ public class World : MonoBehaviour {
 
     public WorldData worldData;
 
-    public string appPath;
+    private string appPath;
 
     private void Awake() {
         if(_instance != null && _instance != this)

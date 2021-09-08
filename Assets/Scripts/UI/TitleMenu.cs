@@ -7,8 +7,11 @@ using System.IO;
 using UnityEngine.SceneManagement;
 
 public class TitleMenu : MonoBehaviour {
+    public static string appPath;
+
     public GameObject mainMenu;
     public GameObject settingsMenu;
+    public GameObject resetWorldButton;
 
     [Header("Settings Menu UI Elements")]
     public Slider viewDistanceSlider;
@@ -20,6 +23,8 @@ public class TitleMenu : MonoBehaviour {
     Settings settings;
 
     private void Awake() {
+        appPath = Application.persistentDataPath;
+
         if(!File.Exists(Application.persistentDataPath + Path.DirectorySeparatorChar + "settings.cfg")) {
             settings = new Settings();
 
@@ -31,8 +36,17 @@ public class TitleMenu : MonoBehaviour {
         }
     }
 
+    private void Start() {
+        resetWorldButton.SetActive(SaveSystem.CheckIfWorldExists("New World"));
+    }
+
     public void StartGame() {
         SceneManager.LoadScene("Game", LoadSceneMode.Single);
+    }
+
+    public void ResetWorld() {
+        SaveSystem.ResetWorld("New World");
+        resetWorldButton.SetActive(false);
     }
 
     public void EnterSettings() {
