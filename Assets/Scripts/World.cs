@@ -170,6 +170,7 @@ public class World : MonoBehaviour {
 
         List<ChunkCoord> previouslyActiveChunks = new List<ChunkCoord>(activeChunks);
         activeChunks.Clear();
+        
         for(int x = coord.x - settings.viewDistance; x < coord.x + settings.viewDistance; x++) {
             for(int z = coord.z - settings.viewDistance; z < coord.z + settings.viewDistance; z++) {
                 ChunkCoord thisChunkCoord = new ChunkCoord(x, z);
@@ -345,8 +346,8 @@ public class VoxelMod {
 [System.Serializable]
 public class Settings {
     [Header("Performance")]
-    public int loadDistance = 16;
-    public int viewDistance = 8;
+    public int loadDistance = 10;
+    public int viewDistance = 5;
     public bool animatedChunks = true;
 
     [Header("Controls")]

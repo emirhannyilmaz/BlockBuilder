@@ -95,17 +95,18 @@ public class Player : MonoBehaviour {
             foreach(Touch t in Input.touches) {
                 if(!IsPointerOverUIObject(t)) {
                     if(t.phase == TouchPhase.Began) {
+                        isPressedDown = true;
                         currentPointer = t;
                         PlaceCursorBlocks();
 
                         if(highlightBlock.gameObject.activeSelf) {
-                            isPressedDown = true;
                             pressedTime = Time.time;
                             highlightBlockStart = highlightBlock.position;
                         }
                     }
 
                     if(t.phase == TouchPhase.Moved) {
+                        isPressedDown = true;
                         mouseHorizontal = t.deltaPosition.x;
                         mouseVertical = t.deltaPosition.y;
                         PlaceCursorBlocks();
@@ -117,6 +118,7 @@ public class Player : MonoBehaviour {
                                 world.GetChunkFromVector3(highlightBlock.position).EditVoxel(highlightBlock.position, 0);
                                 destroyingMode = true;
                                 pressedTime = Time.time;
+                                PlaceCursorBlocks();
                             }
                         }
 
@@ -135,16 +137,31 @@ public class Player : MonoBehaviour {
                                     isPressedDown = false;
                                     destroyingMode = false;
                                     PlaceCursorBlocks();
+                                } else {
+                                    isPressedDown = false;
                                 }
                             }
+                        } else {
+                            isPressedDown = false;
                         }
 
                         mouseHorizontal = 0f;
                         mouseVertical = 0f;
                     }
                 } else {
-                    mouseHorizontal = 0f;
-                    mouseVertical = 0f;
+                    if(isPressedDown) {
+                        if(t.phase == TouchPhase.Moved) {
+                            mouseHorizontal = t.deltaPosition.x;
+                            mouseVertical = t.deltaPosition.y;
+                        } else if(t.phase == TouchPhase.Stationary) {
+                            mouseHorizontal = 0f;
+                            mouseVertical = 0f;
+                        } else if(t.phase == TouchPhase.Ended) {
+                            isPressedDown = false;
+                            mouseHorizontal = 0f;
+                            mouseVertical = 0f;
+                        }
+                    }
                 }
             }
         }
@@ -175,26 +192,40 @@ public class Player : MonoBehaviour {
     }
 
     private float CheckDownSpeed(float downSpeed) {
-        if(world.CheckForVoxel(new Vector3(transform.position.x - playerWidth, transform.position.y + downSpeed, transform.position.z - playerWidth)) ||
+        if((world.CheckForVoxel(new Vector3(transform.position.x - playerWidth, transform.position.y + downSpeed, transform.position.z - playerWidth)) ||
            world.CheckForVoxel(new Vector3(transform.position.x + playerWidth, transform.position.y + downSpeed, transform.position.z - playerWidth)) ||
            world.CheckForVoxel(new Vector3(transform.position.x + playerWidth, transform.position.y + downSpeed, transform.position.z + playerWidth)) ||
-           world.CheckForVoxel(new Vector3(transform.position.x - playerWidth, transform.position.y + downSpeed, transform.position.z + playerWidth))) {
+           world.CheckForVoxel(new Vector3(transform.position.x - playerWidth, transform.position.y + downSpeed, transform.position.z + playerWidth))) &&
+           (!left && !right && !back && !front)) {
             isGrounded = true;
             return 0;
-        } else {
+        } else if(!world.CheckForVoxel(new Vector3(transform.position.x - playerWidth, transform.position.y + downSpeed, transform.position.z - playerWidth)) ||
+           !world.CheckForVoxel(new Vector3(transform.position.x + playerWidth, transform.position.y + downSpeed, transform.position.z - playerWidth)) ||
+           !world.CheckForVoxel(new Vector3(transform.position.x + playerWidth, transform.position.y + downSpeed, transform.position.z + playerWidth)) ||
+           !world.CheckForVoxel(new Vector3(transform.position.x - playerWidth, transform.position.y + downSpeed, transform.position.z + playerWidth))) {
             isGrounded = false;
             return downSpeed;
+        } else {
+            isGrounded = true;
+            return 0;
         }
     }
 
     private float CheckUpSpeed(float upSpeed) {
-        if(world.CheckForVoxel(new Vector3(transform.position.x - playerWidth, transform.position.y + 2f + upSpeed, transform.position.z - playerWidth)) ||
+        if((world.CheckForVoxel(new Vector3(transform.position.x - playerWidth, transform.position.y + 2f + upSpeed, transform.position.z - playerWidth)) ||
            world.CheckForVoxel(new Vector3(transform.position.x + playerWidth, transform.position.y + 2f + upSpeed, transform.position.z - playerWidth)) ||
            world.CheckForVoxel(new Vector3(transform.position.x + playerWidth, transform.position.y + 2f + upSpeed, transform.position.z + playerWidth)) ||
-           world.CheckForVoxel(new Vector3(transform.position.x - playerWidth, transform.position.y + 2f + upSpeed, transform.position.z + playerWidth)))
+           world.CheckForVoxel(new Vector3(transform.position.x - playerWidth, transform.position.y + 2f + upSpeed, transform.position.z + playerWidth))) &&
+           (!left && !right && !back && !front)) {
             return 0;
-        else
+        } else if(!world.CheckForVoxel(new Vector3(transform.position.x - playerWidth, transform.position.y + 2f + upSpeed, transform.position.z - playerWidth)) ||
+           !world.CheckForVoxel(new Vector3(transform.position.x + playerWidth, transform.position.y + 2f + upSpeed, transform.position.z - playerWidth)) ||
+           !world.CheckForVoxel(new Vector3(transform.position.x + playerWidth, transform.position.y + 2f + upSpeed, transform.position.z + playerWidth)) ||
+           !world.CheckForVoxel(new Vector3(transform.position.x - playerWidth, transform.position.y + 2f + upSpeed, transform.position.z + playerWidth))) {
             return upSpeed;
+        } else {
+            return 0;
+        }
     }
 
     public bool front {

@@ -207,8 +207,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   settings:
-    loadDistance: 16
-    viewDistance: 8
+    loadDistance: 10
+    viewDistance: 5
     animatedChunks: 1
     sensitivity: 1
   biomes:
@@ -382,7 +382,6 @@ MonoBehaviour:
     playerZ: 0
     playerRotY: 0
     cameraRotX: 0
-  appPath: 
 --- !u!4 &200495559
 Transform:
   m_ObjectHideFlags: 0

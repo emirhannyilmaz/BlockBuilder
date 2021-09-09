@@ -11,6 +11,7 @@ public class TitleMenu : MonoBehaviour {
 
     public GameObject mainMenu;
     public GameObject settingsMenu;
+    public GameObject loadingScreen;
     public GameObject resetWorldButton;
 
     [Header("Settings Menu UI Elements")]
@@ -41,6 +42,8 @@ public class TitleMenu : MonoBehaviour {
     }
 
     public void StartGame() {
+        mainMenu.SetActive(false);
+        loadingScreen.SetActive(true);
         SceneManager.LoadScene("Game", LoadSceneMode.Single);
     }
 
