@@ -221,9 +221,12 @@ MonoBehaviour:
   blockTypes:
   - blockName: Air
     isSolid: 0
+    isBreakable: 0
     renderNeighborFaces: 1
-    transparency: 1
     icon: {fileID: 0}
+    walkSound: {fileID: 0}
+    putSound: {fileID: 0}
+    destroySound: {fileID: 0}
     backFaceTexture: 0
     frontFaceTexture: 0
     topFaceTexture: 0
@@ -232,9 +235,12 @@ MonoBehaviour:
     rightFaceTexture: 0
   - blockName: Bedrock
     isSolid: 1
+    isBreakable: 0
     renderNeighborFaces: 0
-    transparency: 0
     icon: {fileID: 4639506938558671751, guid: 59b090cfb1c76af4ba160dd97a3fa905, type: 3}
+    walkSound: {fileID: 8300000, guid: b8da35185c17df440a0d9e0309ac22a3, type: 3}
+    putSound: {fileID: 8300000, guid: 4544cd1f9b0d00a498e3602ecfffcacc, type: 3}
+    destroySound: {fileID: 8300000, guid: 4544cd1f9b0d00a498e3602ecfffcacc, type: 3}
     backFaceTexture: 7
     frontFaceTexture: 7
     topFaceTexture: 7
@@ -243,9 +249,12 @@ MonoBehaviour:
     rightFaceTexture: 7
   - blockName: Stone
     isSolid: 1
+    isBreakable: 1
     renderNeighborFaces: 0
-    transparency: 0
     icon: {fileID: -488721925442295091, guid: 59b090cfb1c76af4ba160dd97a3fa905, type: 3}
+    walkSound: {fileID: 8300000, guid: b8da35185c17df440a0d9e0309ac22a3, type: 3}
+    putSound: {fileID: 8300000, guid: 4544cd1f9b0d00a498e3602ecfffcacc, type: 3}
+    destroySound: {fileID: 8300000, guid: 4544cd1f9b0d00a498e3602ecfffcacc, type: 3}
     backFaceTexture: 4
     frontFaceTexture: 4
     topFaceTexture: 4
@@ -254,9 +263,12 @@ MonoBehaviour:
     rightFaceTexture: 4
   - blockName: Grass
     isSolid: 1
+    isBreakable: 1
     renderNeighborFaces: 0
-    transparency: 0
     icon: {fileID: 8033092973025764044, guid: 59b090cfb1c76af4ba160dd97a3fa905, type: 3}
+    walkSound: {fileID: 8300000, guid: fdfa07727ba18e146b0d737f16110ba5, type: 3}
+    putSound: {fileID: 8300000, guid: fdfa07727ba18e146b0d737f16110ba5, type: 3}
+    destroySound: {fileID: 8300000, guid: fdfa07727ba18e146b0d737f16110ba5, type: 3}
     backFaceTexture: 1
     frontFaceTexture: 1
     topFaceTexture: 0
@@ -265,9 +277,12 @@ MonoBehaviour:
     rightFaceTexture: 1
   - blockName: Sand
     isSolid: 1
+    isBreakable: 1
     renderNeighborFaces: 0
-    transparency: 0
     icon: {fileID: -7573354855677281409, guid: 59b090cfb1c76af4ba160dd97a3fa905, type: 3}
+    walkSound: {fileID: 8300000, guid: fdfa07727ba18e146b0d737f16110ba5, type: 3}
+    putSound: {fileID: 8300000, guid: fdfa07727ba18e146b0d737f16110ba5, type: 3}
+    destroySound: {fileID: 8300000, guid: fdfa07727ba18e146b0d737f16110ba5, type: 3}
     backFaceTexture: 3
     frontFaceTexture: 3
     topFaceTexture: 3
@@ -276,9 +291,12 @@ MonoBehaviour:
     rightFaceTexture: 3
   - blockName: Dirt
     isSolid: 1
+    isBreakable: 1
     renderNeighborFaces: 0
-    transparency: 0
     icon: {fileID: 4337684191699249041, guid: 59b090cfb1c76af4ba160dd97a3fa905, type: 3}
+    walkSound: {fileID: 8300000, guid: fdfa07727ba18e146b0d737f16110ba5, type: 3}
+    putSound: {fileID: 8300000, guid: fdfa07727ba18e146b0d737f16110ba5, type: 3}
+    destroySound: {fileID: 8300000, guid: fdfa07727ba18e146b0d737f16110ba5, type: 3}
     backFaceTexture: 2
     frontFaceTexture: 2
     topFaceTexture: 2
@@ -287,9 +305,12 @@ MonoBehaviour:
     rightFaceTexture: 2
   - blockName: Wood
     isSolid: 1
+    isBreakable: 1
     renderNeighborFaces: 0
-    transparency: 0
     icon: {fileID: -2064859774160998932, guid: 59b090cfb1c76af4ba160dd97a3fa905, type: 3}
+    walkSound: {fileID: 8300000, guid: b8da35185c17df440a0d9e0309ac22a3, type: 3}
+    putSound: {fileID: 8300000, guid: 4544cd1f9b0d00a498e3602ecfffcacc, type: 3}
+    destroySound: {fileID: 8300000, guid: 4544cd1f9b0d00a498e3602ecfffcacc, type: 3}
     backFaceTexture: 10
     frontFaceTexture: 10
     topFaceTexture: 11
@@ -298,9 +319,12 @@ MonoBehaviour:
     rightFaceTexture: 10
   - blockName: Planks
     isSolid: 1
+    isBreakable: 1
     renderNeighborFaces: 0
-    transparency: 0
     icon: {fileID: -5971942374765049077, guid: 59b090cfb1c76af4ba160dd97a3fa905, type: 3}
+    walkSound: {fileID: 8300000, guid: b8da35185c17df440a0d9e0309ac22a3, type: 3}
+    putSound: {fileID: 8300000, guid: 4544cd1f9b0d00a498e3602ecfffcacc, type: 3}
+    destroySound: {fileID: 8300000, guid: 4544cd1f9b0d00a498e3602ecfffcacc, type: 3}
     backFaceTexture: 6
     frontFaceTexture: 6
     topFaceTexture: 6
@@ -309,9 +333,12 @@ MonoBehaviour:
     rightFaceTexture: 6
   - blockName: Bricks
     isSolid: 1
+    isBreakable: 1
     renderNeighborFaces: 0
-    transparency: 0
     icon: {fileID: 1801263428120863714, guid: 59b090cfb1c76af4ba160dd97a3fa905, type: 3}
+    walkSound: {fileID: 8300000, guid: b8da35185c17df440a0d9e0309ac22a3, type: 3}
+    putSound: {fileID: 8300000, guid: 4544cd1f9b0d00a498e3602ecfffcacc, type: 3}
+    destroySound: {fileID: 8300000, guid: 4544cd1f9b0d00a498e3602ecfffcacc, type: 3}
     backFaceTexture: 5
     frontFaceTexture: 5
     topFaceTexture: 5
@@ -320,9 +347,12 @@ MonoBehaviour:
     rightFaceTexture: 5
   - blockName: Cobblestone
     isSolid: 1
+    isBreakable: 1
     renderNeighborFaces: 0
-    transparency: 0
     icon: {fileID: -6099050445329199328, guid: 59b090cfb1c76af4ba160dd97a3fa905, type: 3}
+    walkSound: {fileID: 8300000, guid: b8da35185c17df440a0d9e0309ac22a3, type: 3}
+    putSound: {fileID: 8300000, guid: 4544cd1f9b0d00a498e3602ecfffcacc, type: 3}
+    destroySound: {fileID: 8300000, guid: 4544cd1f9b0d00a498e3602ecfffcacc, type: 3}
     backFaceTexture: 8
     frontFaceTexture: 8
     topFaceTexture: 8
@@ -331,9 +361,12 @@ MonoBehaviour:
     rightFaceTexture: 8
   - blockName: Glass
     isSolid: 1
+    isBreakable: 1
     renderNeighborFaces: 1
-    transparency: 1
     icon: {fileID: -7855203551248514480, guid: 59b090cfb1c76af4ba160dd97a3fa905, type: 3}
+    walkSound: {fileID: 8300000, guid: b8da35185c17df440a0d9e0309ac22a3, type: 3}
+    putSound: {fileID: 8300000, guid: 4544cd1f9b0d00a498e3602ecfffcacc, type: 3}
+    destroySound: {fileID: 8300000, guid: 4544cd1f9b0d00a498e3602ecfffcacc, type: 3}
     backFaceTexture: 9
     frontFaceTexture: 9
     topFaceTexture: 9
@@ -342,9 +375,12 @@ MonoBehaviour:
     rightFaceTexture: 9
   - blockName: Leaf
     isSolid: 1
+    isBreakable: 1
     renderNeighborFaces: 1
-    transparency: 0.75
     icon: {fileID: 0}
+    walkSound: {fileID: 8300000, guid: fdfa07727ba18e146b0d737f16110ba5, type: 3}
+    putSound: {fileID: 8300000, guid: fdfa07727ba18e146b0d737f16110ba5, type: 3}
+    destroySound: {fileID: 8300000, guid: fdfa07727ba18e146b0d737f16110ba5, type: 3}
     backFaceTexture: 12
     frontFaceTexture: 12
     topFaceTexture: 12
@@ -353,9 +389,12 @@ MonoBehaviour:
     rightFaceTexture: 12
   - blockName: Cactus
     isSolid: 1
+    isBreakable: 1
     renderNeighborFaces: 0
-    transparency: 0
     icon: {fileID: 0}
+    walkSound: {fileID: 8300000, guid: fdfa07727ba18e146b0d737f16110ba5, type: 3}
+    putSound: {fileID: 8300000, guid: fdfa07727ba18e146b0d737f16110ba5, type: 3}
+    destroySound: {fileID: 8300000, guid: fdfa07727ba18e146b0d737f16110ba5, type: 3}
     backFaceTexture: 14
     frontFaceTexture: 14
     topFaceTexture: 15
@@ -364,9 +403,12 @@ MonoBehaviour:
     rightFaceTexture: 14
   - blockName: Cactus Top
     isSolid: 1
+    isBreakable: 1
     renderNeighborFaces: 0
-    transparency: 0
     icon: {fileID: 0}
+    walkSound: {fileID: 8300000, guid: fdfa07727ba18e146b0d737f16110ba5, type: 3}
+    putSound: {fileID: 8300000, guid: fdfa07727ba18e146b0d737f16110ba5, type: 3}
+    destroySound: {fileID: 8300000, guid: fdfa07727ba18e146b0d737f16110ba5, type: 3}
     backFaceTexture: 14
     frontFaceTexture: 14
     topFaceTexture: 13
@@ -1390,11 +1432,16 @@ MonoBehaviour:
   playerWidth: 0.25
   isGrounded: 0
   camXRotation: 0
+  horizontal: 0
+  vertical: 0
+  mouseHorizontal: 0
+  mouseVertical: 0
   highlightBlock: {fileID: 1311125443}
   placeHighlightBlock: {fileID: 1242900757}
   checkIncrement: 0.1
   reach: 4
   selectedBlockIndex: 1
+  isPressedDown: 0
 --- !u!1 &710482951
 GameObject:
   m_ObjectHideFlags: 0

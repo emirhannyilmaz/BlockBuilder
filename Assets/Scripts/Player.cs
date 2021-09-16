@@ -13,10 +13,10 @@ public class Player : MonoBehaviour {
     private Camera cam;
     public float camXRotation = 0f;
     private World world;
-    private float horizontal;
-    private float vertical;
-    private float mouseHorizontal;
-    private float mouseVertical;
+    public float horizontal;
+    public float vertical;
+    public float mouseHorizontal;
+    public float mouseVertical;
     private Vector3 velocity;
     private float verticalMomentum = 0f;
     private bool jumpRequest = false;
@@ -29,11 +29,19 @@ public class Player : MonoBehaviour {
     public byte selectedBlockIndex = 1;
 
     float pressedTime;
-    bool isPressedDown = false;
+    public bool isPressedDown = false;
 
     private Touch currentPointer;
     private Vector3 highlightBlockStart;
     private bool destroyingMode = false;
+
+    private Vector3 position;
+    private Vector3 lastPosition;
+    private bool firstSet = true;
+    private float leftOffset;
+    private float rightOffset;
+    private float frontOffset;
+    private float backOffset;
 
     private void Start() {
         cam = GameObject.Find("Main Camera").GetComponent<Camera>();
@@ -42,6 +50,14 @@ public class Player : MonoBehaviour {
 
     private void Update() {
         GetPlayerInputs();
+
+        if(isGrounded) {
+            position = transform.position;
+            if(firstSet) {
+                lastPosition = transform.position;
+                firstSet = false;
+            }
+        }
     }
 
     private void FixedUpdate() {
@@ -55,6 +71,40 @@ public class Player : MonoBehaviour {
         camXRotation = Mathf.Clamp(camXRotation, -90f, 90f);
         cam.transform.localRotation = Quaternion.Euler(camXRotation, 0f, 0f);
         transform.Translate(velocity, Space.World);
+        if(isGrounded) {
+            position = transform.position;
+        }
+        if(position != lastPosition && isGrounded) {
+            if(!FindObjectOfType<SoundManager>().GetComponent<AudioSource>().isPlaying) {
+                AudioClip walkSoundAudioClip = World.Instance.blockTypes[World.Instance.GetVoxelState(new Vector3(position.x, position.y - 0.5f, position.z)).id].walkSound;
+                FindObjectOfType<SoundManager>().PlaySound(walkSoundAudioClip, 0.5f);
+            }
+            lastPosition = position;
+        }
+
+        if(left) {
+            leftOffset = 0f;
+        } else {
+            leftOffset = playerWidth;
+        }
+
+        if(right) {
+            rightOffset = 0f;
+        } else {
+            rightOffset = playerWidth;
+        }
+
+        if(front) {
+            frontOffset = 0f;
+        } else {
+            frontOffset = playerWidth;
+        }
+
+        if(back) {
+            backOffset = 0f;
+        } else {
+            backOffset = playerWidth;
+        }
     }
 
     private void Jump() {
@@ -115,10 +165,16 @@ public class Player : MonoBehaviour {
                     if(t.phase == TouchPhase.Stationary) {
                         if(highlightBlock.gameObject.activeSelf) {
                             if(Time.time - pressedTime >= 0.5f && isPressedDown && (highlightBlockStart == highlightBlock.position || destroyingMode)) {
-                                world.GetChunkFromVector3(highlightBlock.position).EditVoxel(highlightBlock.position, 0);
-                                destroyingMode = true;
-                                pressedTime = Time.time;
-                                PlaceCursorBlocks();
+                                if(World.Instance.blockTypes[world.GetChunkFromVector3(highlightBlock.position).GetVoxelFromGlobalVector3(highlightBlock.position).id].isBreakable) {
+                                    FindObjectOfType<SoundManager>().PlaySound(World.Instance.blockTypes[world.GetChunkFromVector3(highlightBlock.position).GetVoxelFromGlobalVector3(highlightBlock.position).id].destroySound, 0.7f);
+                                    world.GetChunkFromVector3(highlightBlock.position).EditVoxel(highlightBlock.position, 0);
+                                    destroyingMode = true;
+                                    pressedTime = Time.time;
+                                    PlaceCursorBlocks();
+                                } else {
+                                    destroyingMode = true;
+                                    pressedTime = Time.time;
+                                }
                             }
                         }
 
@@ -130,6 +186,7 @@ public class Player : MonoBehaviour {
                         if(highlightBlock.gameObject.activeSelf) {
                             if(isPressedDown) {
                                 if(!destroyingMode && highlightBlockStart == highlightBlock.position) {
+                                    FindObjectOfType<SoundManager>().PlaySound(World.Instance.blockTypes[selectedBlockIndex].putSound, 0.7f);
                                     world.GetChunkFromVector3(placeHighlightBlock.position).EditVoxel(placeHighlightBlock.position, selectedBlockIndex);
                                     isPressedDown = false;
                                     PlaceCursorBlocks();
@@ -192,39 +249,26 @@ public class Player : MonoBehaviour {
     }
 
     private float CheckDownSpeed(float downSpeed) {
-        if((world.CheckForVoxel(new Vector3(transform.position.x - playerWidth, transform.position.y + downSpeed, transform.position.z - playerWidth)) ||
-           world.CheckForVoxel(new Vector3(transform.position.x + playerWidth, transform.position.y + downSpeed, transform.position.z - playerWidth)) ||
-           world.CheckForVoxel(new Vector3(transform.position.x + playerWidth, transform.position.y + downSpeed, transform.position.z + playerWidth)) ||
-           world.CheckForVoxel(new Vector3(transform.position.x - playerWidth, transform.position.y + downSpeed, transform.position.z + playerWidth))) &&
-           (!left && !right && !back && !front)) {
+        if(world.CheckForVoxel(new Vector3(transform.position.x - leftOffset, transform.position.y + downSpeed, transform.position.z)) ||
+           world.CheckForVoxel(new Vector3(transform.position.x + rightOffset, transform.position.y + downSpeed, transform.position.z)) ||
+           world.CheckForVoxel(new Vector3(transform.position.x, transform.position.y + downSpeed, transform.position.z + frontOffset)) ||
+           world.CheckForVoxel(new Vector3(transform.position.x, transform.position.y + downSpeed, transform.position.z - backOffset))) {
             isGrounded = true;
             return 0;
-        } else if(!world.CheckForVoxel(new Vector3(transform.position.x - playerWidth, transform.position.y + downSpeed, transform.position.z - playerWidth)) ||
-           !world.CheckForVoxel(new Vector3(transform.position.x + playerWidth, transform.position.y + downSpeed, transform.position.z - playerWidth)) ||
-           !world.CheckForVoxel(new Vector3(transform.position.x + playerWidth, transform.position.y + downSpeed, transform.position.z + playerWidth)) ||
-           !world.CheckForVoxel(new Vector3(transform.position.x - playerWidth, transform.position.y + downSpeed, transform.position.z + playerWidth))) {
+        } else {
             isGrounded = false;
             return downSpeed;
-        } else {
-            isGrounded = true;
-            return 0;
         }
     }
 
     private float CheckUpSpeed(float upSpeed) {
-        if((world.CheckForVoxel(new Vector3(transform.position.x - playerWidth, transform.position.y + 2f + upSpeed, transform.position.z - playerWidth)) ||
-           world.CheckForVoxel(new Vector3(transform.position.x + playerWidth, transform.position.y + 2f + upSpeed, transform.position.z - playerWidth)) ||
-           world.CheckForVoxel(new Vector3(transform.position.x + playerWidth, transform.position.y + 2f + upSpeed, transform.position.z + playerWidth)) ||
-           world.CheckForVoxel(new Vector3(transform.position.x - playerWidth, transform.position.y + 2f + upSpeed, transform.position.z + playerWidth))) &&
-           (!left && !right && !back && !front)) {
+        if(world.CheckForVoxel(new Vector3(transform.position.x - leftOffset, transform.position.y + 2f + upSpeed, transform.position.z)) ||
+           world.CheckForVoxel(new Vector3(transform.position.x + rightOffset, transform.position.y + 2f + upSpeed, transform.position.z)) ||
+           world.CheckForVoxel(new Vector3(transform.position.x, transform.position.y + 2f + upSpeed, transform.position.z + frontOffset)) ||
+           world.CheckForVoxel(new Vector3(transform.position.x, transform.position.y + 2f + upSpeed, transform.position.z - backOffset))) {
             return 0;
-        } else if(!world.CheckForVoxel(new Vector3(transform.position.x - playerWidth, transform.position.y + 2f + upSpeed, transform.position.z - playerWidth)) ||
-           !world.CheckForVoxel(new Vector3(transform.position.x + playerWidth, transform.position.y + 2f + upSpeed, transform.position.z - playerWidth)) ||
-           !world.CheckForVoxel(new Vector3(transform.position.x + playerWidth, transform.position.y + 2f + upSpeed, transform.position.z + playerWidth)) ||
-           !world.CheckForVoxel(new Vector3(transform.position.x - playerWidth, transform.position.y + 2f + upSpeed, transform.position.z + playerWidth))) {
-            return upSpeed;
         } else {
-            return 0;
+            return upSpeed;
         }
     }
 

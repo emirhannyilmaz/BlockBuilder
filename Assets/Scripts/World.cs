@@ -170,7 +170,7 @@ public class World : MonoBehaviour {
 
         List<ChunkCoord> previouslyActiveChunks = new List<ChunkCoord>(activeChunks);
         activeChunks.Clear();
-        
+
         for(int x = coord.x - settings.viewDistance; x < coord.x + settings.viewDistance; x++) {
             for(int z = coord.z - settings.viewDistance; z < coord.z + settings.viewDistance; z++) {
                 ChunkCoord thisChunkCoord = new ChunkCoord(x, z);
@@ -296,9 +296,12 @@ public class World : MonoBehaviour {
 public class BlockType {
     public string blockName;
     public bool isSolid;
+    public bool isBreakable;
     public bool renderNeighborFaces;
-    public float transparency;
     public Sprite icon;
+    public AudioClip walkSound;
+    public AudioClip putSound;
+    public AudioClip destroySound;
 
     public int backFaceTexture;
     public int frontFaceTexture;

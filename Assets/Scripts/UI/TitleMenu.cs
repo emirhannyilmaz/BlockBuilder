@@ -23,6 +23,8 @@ public class TitleMenu : MonoBehaviour {
 
     Settings settings;
 
+    bool enteredSettingsMenu = false;
+
     private void Awake() {
         appPath = Application.persistentDataPath;
 
@@ -42,28 +44,33 @@ public class TitleMenu : MonoBehaviour {
     }
 
     public void StartGame() {
+        FindObjectOfType<SoundManager>().PlaySound("ButtonClickSound", 1.0f);
         mainMenu.SetActive(false);
         loadingScreen.SetActive(true);
         SceneManager.LoadScene("Game", LoadSceneMode.Single);
     }
 
     public void ResetWorld() {
+        FindObjectOfType<SoundManager>().PlaySound("ButtonClickSound", 1.0f);
         SaveSystem.ResetWorld("New World");
         resetWorldButton.SetActive(false);
     }
 
     public void EnterSettings() {
+        FindObjectOfType<SoundManager>().PlaySound("ButtonClickSound", 1.0f);
         viewDistanceSlider.value = settings.viewDistance;
         UpdateViewDistanceSlider();
         sensitivitySlider.value = settings.sensitivity;
         UpdateSensitivitySlider();
         animatedChunksToggle.isOn = settings.animatedChunks;
+        enteredSettingsMenu = true;
 
         mainMenu.SetActive(false);
         settingsMenu.SetActive(true);
     }
 
     public void LeaveSettings() {
+        FindObjectOfType<SoundManager>().PlaySound("ButtonClickSound", 1.0f);
         settings.viewDistance = (int) viewDistanceSlider.value;
         settings.loadDistance = settings.viewDistance * 2;
         settings.sensitivity = sensitivitySlider.value;
@@ -74,9 +81,11 @@ public class TitleMenu : MonoBehaviour {
 
         mainMenu.SetActive(true);
         settingsMenu.SetActive(false);
+        enteredSettingsMenu = false;
     }
 
     public void QuitGame() {
+        FindObjectOfType<SoundManager>().PlaySound("ButtonClickSound", 1.0f);
         Application.Quit();
     }
 
@@ -86,5 +95,12 @@ public class TitleMenu : MonoBehaviour {
 
     public void UpdateSensitivitySlider() {
         sensitivityText.SetText("Sensitivity: " + sensitivitySlider.value.ToString("F1"));
+    }
+
+    public void AnimatedChunksToggle() {
+        if(enteredSettingsMenu) {
+            print("hey");
+            FindObjectOfType<SoundManager>().PlaySound("ButtonClickSound", 1.0f);
+        }
     }
 }
