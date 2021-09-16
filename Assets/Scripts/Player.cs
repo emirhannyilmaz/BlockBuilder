@@ -32,6 +32,7 @@ public class Player : MonoBehaviour {
     public bool isPressedDown = false;
 
     private Touch currentPointer;
+    private int currentPointerId;
     private Vector3 highlightBlockStart;
     private bool destroyingMode = false;
 
@@ -147,6 +148,7 @@ public class Player : MonoBehaviour {
                     if(t.phase == TouchPhase.Began) {
                         isPressedDown = true;
                         currentPointer = t;
+                        currentPointerId = t.fingerId;
                         PlaceCursorBlocks();
 
                         if(highlightBlock.gameObject.activeSelf) {
@@ -206,7 +208,7 @@ public class Player : MonoBehaviour {
                         mouseVertical = 0f;
                     }
                 } else {
-                    if(isPressedDown) {
+                    if(isPressedDown && t.fingerId == currentPointerId) {
                         if(t.phase == TouchPhase.Moved) {
                             mouseHorizontal = t.deltaPosition.x;
                             mouseVertical = t.deltaPosition.y;
