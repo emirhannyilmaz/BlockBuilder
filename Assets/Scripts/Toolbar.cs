@@ -9,6 +9,8 @@ public class Toolbar : MonoBehaviour {
 
     public RectTransform highlight;
     public ItemSlot[] itemSlots;
+    public GameObject inventory;
+    public int currentItemSlot;
 
     private void Start() {
         world = GameObject.Find("World").GetComponent<World>();
@@ -19,11 +21,25 @@ public class Toolbar : MonoBehaviour {
         }
 
         player.selectedBlockIndex = itemSlots[0].itemID;
+        currentItemSlot = 0;
     }
 
     public void Select(int index) {
         highlight.position = itemSlots[index].icon.transform.position;
         player.selectedBlockIndex = itemSlots[index].itemID;
+        currentItemSlot = index;
+    }
+
+    public void ToggleInventory() {
+        inventory.SetActive(!inventory.activeSelf);
+    }
+
+    public void Redraw() {
+        foreach(ItemSlot slot in itemSlots) {
+            slot.icon.sprite = world.blockTypes[slot.itemID].icon;
+        }
+
+        player.selectedBlockIndex = itemSlots[currentItemSlot].itemID;
     }
 }
 

@@ -99,7 +99,6 @@ public class TitleMenu : MonoBehaviour {
 
     public void AnimatedChunksToggle() {
         if(enteredSettingsMenu) {
-            print("hey");
             FindObjectOfType<SoundManager>().PlaySound("ButtonClickSound", 1.0f);
         }
     }
