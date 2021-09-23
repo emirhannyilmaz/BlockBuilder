@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using TMPro;
 using System.IO;
 using UnityEngine.SceneManagement;
+using UnityEngine.Advertisements;
 
 public class TitleMenu : MonoBehaviour {
     public static string appPath;
@@ -40,10 +41,12 @@ public class TitleMenu : MonoBehaviour {
     }
 
     private void Start() {
+        Advertisement.Banner.Show("Banner_Android");
         resetWorldButton.SetActive(SaveSystem.CheckIfWorldExists("New World"));
     }
 
     public void StartGame() {
+        Advertisement.Banner.Hide();
         FindObjectOfType<SoundManager>().PlaySound("ButtonClickSound", 1.0f);
         mainMenu.SetActive(false);
         loadingScreen.SetActive(true);

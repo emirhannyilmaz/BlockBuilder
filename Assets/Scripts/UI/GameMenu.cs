@@ -1,14 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
-using System.IO;
 using UnityEngine.SceneManagement;
 
 public class GameMenu : MonoBehaviour {
     public GameObject pauseMenu;
     public GameObject[] gameUIElements;
+    public GameObject inventory;
 
     public void PauseMenu() {
         FindObjectOfType<SoundManager>().PlaySound("ButtonClickSound", 1.0f);
@@ -16,6 +14,8 @@ public class GameMenu : MonoBehaviour {
         foreach(GameObject go in gameUIElements) {
             go.SetActive(false);
         }
+
+        inventory.SetActive(false);
     }
 
     public void ContinueGame() {

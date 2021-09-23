@@ -167,7 +167,7 @@ public class Player : MonoBehaviour {
                     if(t.phase == TouchPhase.Stationary) {
                         if(highlightBlock.gameObject.activeSelf) {
                             if(Time.time - pressedTime >= 0.5f && isPressedDown && (highlightBlockStart == highlightBlock.position || destroyingMode)) {
-                                if(World.Instance.blockTypes[world.GetChunkFromVector3(highlightBlock.position).GetVoxelFromGlobalVector3(highlightBlock.position).id].isBreakable) {
+                                if(highlightBlock.position.y != 0) {
                                     FindObjectOfType<SoundManager>().PlaySound(World.Instance.blockTypes[world.GetChunkFromVector3(highlightBlock.position).GetVoxelFromGlobalVector3(highlightBlock.position).id].destroySound, 0.7f);
                                     world.GetChunkFromVector3(highlightBlock.position).EditVoxel(highlightBlock.position, 0);
                                     destroyingMode = true;
