@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.3731193, g: 0.38073996, b: 0.35872698, a: 1}
+  m_IndirectSpecularColor: {r: 0.37311947, g: 0.38074005, b: 0.35872722, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -619,6 +619,94 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 1024543358385136229, guid: 20e5ee1fb5298284e82f4452f8cfdf08, type: 3}
   m_PrefabInstance: {fileID: 136793571}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &289375111
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 289375113}
+  - component: {fileID: 289375112}
+  m_Layer: 0
+  m_Name: Interstitial Ad
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &289375112
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 289375111}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 403243224, guid: a1b1ab44b4414d64bd404c895fbd1eab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  adType: 1
+  selectedPlacementIndex: 0
+  androidAdUnitId: ca-app-pub-8958187204586991/7542024734
+  iOSAdUnitId: 
+  persistent: 1
+  autoLoadEnabled: 0
+  onAdLoaded:
+    m_PersistentCalls:
+      m_Calls: []
+  onAdFailedToLoad:
+    m_PersistentCalls:
+      m_Calls: []
+  onAdOpening:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 507136264}
+        m_TargetAssemblyTypeName: AdManager, Assembly-CSharp
+        m_MethodName: OnInterstitialAdOpening
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onAdClosed:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 507136264}
+        m_TargetAssemblyTypeName: AdManager, Assembly-CSharp
+        m_MethodName: OnInterstitialAdClosed
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onAdLeavingApplication:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!4 &289375113
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 289375111}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &398616455 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6498821482066543588, guid: 910b14636ff2ebf448e2deba1eaf16b1, type: 3}
@@ -2446,6 +2534,77 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2013379845}
   m_CullTransparentMesh: 1
+--- !u!1 &2079110703
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2079110705}
+  - component: {fileID: 2079110704}
+  m_Layer: 0
+  m_Name: Banner Ad
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2079110704
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2079110703}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -287287577, guid: a1b1ab44b4414d64bd404c895fbd1eab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  adType: 0
+  selectedPlacementIndex: 0
+  androidAdUnitId: ca-app-pub-8958187204586991/1796241019
+  iOSAdUnitId: 
+  persistent: 0
+  autoLoadEnabled: 1
+  adSize:
+    type: 1
+    width: 0
+    height: 0
+    orientation: 0
+  adPosition: 1
+  adPositionOffset: {x: 0, y: 0}
+  onAdLoaded:
+    m_PersistentCalls:
+      m_Calls: []
+  onAdFailedToLoad:
+    m_PersistentCalls:
+      m_Calls: []
+  onAdOpening:
+    m_PersistentCalls:
+      m_Calls: []
+  onAdClosed:
+    m_PersistentCalls:
+      m_Calls: []
+  onAdLeavingApplication:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!4 &2079110705
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2079110703}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!224 &2120539255 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 6498821482066543595, guid: 910b14636ff2ebf448e2deba1eaf16b1, type: 3}
